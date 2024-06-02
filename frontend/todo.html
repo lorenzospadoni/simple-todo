@@ -2,18 +2,31 @@
 <html>
     <head>
         <link rel="stylesheet" href="css/style.css">
-        <script type="text/javascript" src="js/todocomponents.js" defer></script>
+        <script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.12/lib/draggable.bundle.legacy.js"></script>
+        <script type="text/javascript" src="js/todocomponents.js"></script>
+        <script type="text/javascript" src="js/overviewcomponents.js"></script>
+        <script type="text/javascript" src="js/burgermenu.js" defer></script>
         <script type="text/javascript" src="js/script.js" defer></script>
 
     </head>
-    <body>
+    <header>
+            <!-- <a href="user.html">Finn32</a>
+            <a href="logout.html">Logout</a> -->
+        <h1>Your todo</h1>
+        <div id="burgermenu">
+            <span class="line line0" id="line0"></span>
+            <span class="line line1" id="line1"></span>
+            <span class="line line2" id="line2"></span>
+        </div>
+    </header>
+    <body oncontextmenu="return false;">
             <!-- <h1 style="text-align: center;">To-do</h1> -->
-            <todo-item id="testitem">Basically everything lmao</todo-item>
-            <todo-item>Ciao da marco </todo-item>
-            <label>
-                <input type="checkbox">
-                <div> Ciao </div>
-            </label>
-            
+            <main id="main_section">
+                <todo-container title="Vari saluti nel mondo" state="open">
+                    <todo-item>Ciao</todo-item>
+                    <todo-item>Hello</todo-item>
+                    <todo-item>Bonjour</todo-item>
+                </todo-container>
+            </main>
     </body>
 </html>

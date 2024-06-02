@@ -1,21 +1,61 @@
-testitem = document.getElementById('testitem');
+const main_section = document.getElementById("main_section");
+const todo_obj = {
+    'title' : "My first todo project",
+    'children' : [
+        {
+            'content' : 'Hello!',
+            'checked' :  false
+        },        
+        {
+            'content' : 'Ciao!',
+            'checked' :  false
+        },
+        {
+            'content' : 'Bonjour!',
+            'checked' :  true
+        }
+    ] 
+};
 
-function dragItem( htmlelement ) {
-    htmlelement.style.position = absolute;
-    htmlelement.style.top = 0;
-}
 
-function myHandler( event ) {
-    function dragItem( htmlelement, positionX, positionY ) {
-        htmlelement.style.position = "absolute";
-        htmlelement.style.bottom = positionY;
-        htmlelement.style.left = positionX;
-    }
-    dragItem(event.target, event.clientX, event.clientY);
-}
+/* const todo_container0 = document.createElement( 'todo-container' );
+main_section.appendChild( todo_container0 );
+todo_container0.obj = todo_obj ;
+ */
 
-/* myitems = document.getElementsByClassName("list_item");
-for (let i = 0; i < myitems.length; i++) {
-    let current_element = myitems[i];
-    document.addEventListener("click", myHandler)
-} */
+// using querySelectorAll because Draggable wants a Node_List, not an HTMLCollection
+/* const list_items = document.querySelectorAll("todo-item");
+const list_container = document.querySelector('section');
+const draggable = new Draggable.Sortable(( list_container ), {
+    draggable : 'todo-item',
+    mirror: {
+        constrainDimensions: true,
+    },
+    classes: {
+        'source:dragging': 'is-dragging',
+        'mirror': 'is-mirror',
+    },
+    plugins: [
+        Draggable.Plugins.SortAnimation
+    ],
+
+    swapAnimation: {
+      duration: 200,
+      easingFunction: 'ease-in-out',
+    },
+});
+
+draggable.on('sortable:sorted', (evt) => {
+    console.log('sortable:sorted')
+})
+draggable.on('sortable:start', ( evt ) => {
+    console.log('sortable:start', evt)
+})
+
+draggable.on('sortable:move', (evt) => {
+    console.log('sortable:move', evt);
+});
+
+draggable.on('sortable:stop', (evt) => {
+    console.log('sortable:stop', evt);
+}); */
