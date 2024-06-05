@@ -1,4 +1,5 @@
 const main_section = document.getElementById("main_section");
+const todo_arrow = document.querySelector('todo-arrow');
 const todo_obj = [{
     'title' : "Saluti nel mondo",
     'children' : [
@@ -57,6 +58,8 @@ const todo_container0 = document.createElement( 'todo-container' );
 main_section.appendChild( todo_container0 );
 console.log(todo_obj)
 todo_container0.obj = todo_obj ;
+
+todo_arrow.container = todo_container0;
 
 // using querySelectorAll because Draggable wants a Node_List, not an HTMLCollection
 /* const list_items = document.querySelectorAll("todo-item");

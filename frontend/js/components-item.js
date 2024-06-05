@@ -56,6 +56,7 @@ class TodoItem extends HTMLElement {
 
         this.checkbox.addEventListener('click', (event) => {
             if (event.target.type === 'checkbox') {
+                this.handleCheckboxChange(event.target.checked);
                 event.stopPropagation();
             }
         })
@@ -82,15 +83,21 @@ class TodoItem extends HTMLElement {
     addEventListeners() {
         this.oncontextmenu = () => { this.editContent() }
     }
+    handleCheckboxChange(isChecked) {
+        if (isChecked) {
+            this.classList.add('item-fade-out');
+            this.addEventListener('animationend', () => {
+                this.remove();
+            });
+        }
+    }
     get obj() {
         return {
             'content' : this.paragraph.textContent,
-            'checked' : this.checkbox.checked
         }
     }
     set obj( object_arg ) {
         this.paragraph.textContent = object_arg.content;
-        this.checkbox.checked = object_arg.checked; 
     }
 }
 

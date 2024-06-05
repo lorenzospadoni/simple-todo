@@ -43,11 +43,13 @@ class TodoContainer extends HTMLElement {
 
     }
     attributeChangedCallback(name, oldValue, newValue) {
-        console.log('attribute ' + name + ' changed from ' + oldValue + ' to ' + newValue);
+        console.log('[CONTAINER]:   attribute ' + name + ' changed from ' + oldValue + ' to ' + newValue);
         if (name === 'state') {
             if (newValue === 'overview') {
                 this.classList.add('container-overview');
                 this.classList.remove('container-single');
+                this.setChildrenStateOverview();
+
             } else if (newValue === 'single') {
                 this.classList.add('container-single');
                 this.classList.remove('container-overview');
@@ -57,7 +59,16 @@ class TodoContainer extends HTMLElement {
     setDoubleClick() {
         let children = Array.prototype.slice.call(this.project_box.children);
         children.forEach( ( child ) => {
-            child.ondblclick = () => { this.openProject( child ); }
+            child.ondblclick = () => { 
+                this.openProject( child );
+                todo_arrow.setAttribute('state', 'single')
+            }
+        });
+    }
+    setChildrenStateOverview() {
+        let children = Array.prototype.slice.call(this.project_box.children);
+        children.forEach( ( child ) => {
+            child.setAttribute('state', 'closed');
         });
     }
     openProject( elem ) {
@@ -67,11 +78,6 @@ class TodoContainer extends HTMLElement {
         });
         elem.setAttribute('state', 'open');
         // elem.setStyleOpen();
-
-        // remove this in favor of a better global state-based system
-        this.title_box.style.display = 'none';
-        this.new_button.style.display = 'none';
-
     }
     newChild() {
         let new_child = document.createElement('todo-project');

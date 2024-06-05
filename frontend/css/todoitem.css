@@ -93,4 +93,16 @@ todo-item > button {
     user-select: none;
     text-align: center;
 }
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    } to {
+        opacity: 0;
+    }
+}
+.item-fade-out {
+    animation-name: fadeOut;
+    animation-duration: 1s;
+}
   

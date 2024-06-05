@@ -43,8 +43,9 @@ class TodoProject extends HTMLElement {
         this.appendChild(this.info_box);
 
         this.title_box.classList.add('title');
-        this.item_box.classList.add('items')
-        this.info_box.classList.add('info_box')
+        this.item_box.classList.add('items');
+        this.info_box.classList.add('info_box');
+
     }
     disconnectedCallback() {
         console.log('TodoProject remove from document');
@@ -62,10 +63,12 @@ class TodoProject extends HTMLElement {
             if ( newValue === 'open' ) {
                 // destroyDraggable();
                 // initDraggable();
+                this.title_box.contentEditable = true;
                 this.setStyleOpen();
                 console.log('open')
             } else if (newValue === 'closed') {
                 // destroyDraggable();
+                this.title_box.contentEditable = false;
                 this.setStyleClosed();
                 console.log('closed');
             } else if (newValue === 'hidden') {
