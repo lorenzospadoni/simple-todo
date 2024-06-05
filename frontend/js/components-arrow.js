@@ -11,8 +11,14 @@ class TodoArrow extends HTMLElement {
         this.onclick = () => { 
             this.container.setAttribute('state', 'overview');
             this.setAttribute('state', 'overview')
-
-         }
+        }
+        if (this.attributes['state'] === 'overview') {
+            this.style.opacity = 0;
+        } else if (this.attributes['state'] == null) {
+            this.setAttribute('state', 'overview')
+        } else {
+            console.log('weird');
+        }
     }
     disconnectedCallback() {
 
