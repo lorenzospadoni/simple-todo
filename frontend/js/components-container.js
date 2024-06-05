@@ -10,6 +10,8 @@ class TodoContainer extends HTMLElement {
         this.project_box = document.createElement('div');
         this.new_button = document.createElement('button');
 
+        this.new_button.onclick = () => { this.newChild() }
+
     }
 
     connectedCallback()   {       
@@ -84,6 +86,17 @@ class TodoContainer extends HTMLElement {
         new_child.setAttribute('state', 'closed');
         this.project_box.appendChild(new_child);
         this.setDoubleClick();
+        new_child.title_box.contentEditable = true;
+        new_child.title_box.focus();
+        new_child.title_box.onblur = () => { 
+            if (new_child.title_box.textContent == "") {
+                new_child.remove();
+                this.setAttribute('state', 'overview')
+            } else {
+                todo_arrow.saveToLocalStorage();
+            }
+        }
+
         return new_child;
     }
     set obj(container_object) {
@@ -91,6 +104,20 @@ class TodoContainer extends HTMLElement {
             let returned_element = this.newChild();
             returned_element.obj = project;
         })
+    }
+    get obj() {
+        let data = [];
+        let children = Array.prototype.slice.call(this.project_box.children);
+        children.forEach( ( child ) => {
+            data.push(child.obj);
+        });
+        return data;
+    }
+    get json() {
+        return JSON.stringify(this.obj);
+    }
+    set json(json_data) {
+        this.obj = JSON.parse(json_data);
     }
 
 

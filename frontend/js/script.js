@@ -54,11 +54,12 @@ const todo_obj = [{
 ];
 
 
-const todo_container0 = document.createElement( 'todo-container' );
-main_section.appendChild( todo_container0 );
+const container = document.createElement( 'todo-container' );
+main_section.appendChild( container );
 console.log(todo_obj)
-todo_container0.obj = todo_obj ;
+// todo_container0.obj = todo_obj ;
 
-todo_arrow.container = todo_container0;
+todo_arrow.container = container;
+todo_arrow.getFromLocalStorage();
 todo_arrow.setAttribute('state', 'overview'); // needed to stop the arrow from appearing on start up
 

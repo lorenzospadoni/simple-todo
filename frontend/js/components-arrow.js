@@ -27,15 +27,21 @@ class TodoArrow extends HTMLElement {
         console.log('[ARROW]:   attribute ' + name + ' changed from ' + oldValue + ' to ' + newValue);
         if (name === 'state') {
             if (newValue === 'overview') {
-                this.container.title_box.style.display = 'initial';
-                this.container.new_button.style.display = 'initial';
                 this.style.opacity = 0;
+                this.container.setAttribute('state', 'overview');
             } else if (newValue === 'single') {
-                this.container.title_box.style.display = 'none';
-                this.container.new_button.style.display = 'none';
                 this.style.opacity = 1;
+                this.container.setAttribute('state', 'single');
             }
         }
+    }
+    saveToLocalStorage() {
+        let container_data = this.container.json;
+        localStorage.setItem('data', container_data);
+    }
+    getFromLocalStorage() {
+        let data = localStorage.getItem('data');
+        this.container.json = data;
     }
     
 }

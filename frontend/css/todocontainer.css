@@ -25,3 +25,10 @@
     background-color: #eee2b1;
     border: 2px solid #eec4b1;
 }
+
+.container-single > h1 {
+    display: none;
+}
+.container-single > button {
+    display: none;
+}

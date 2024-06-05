@@ -79,6 +79,7 @@ class TodoItem extends HTMLElement {
     editContent() {
         this.paragraph.contentEditable = true;
         this.paragraph.focus();
+        this.paragraph.onblur = () => { todo_arrow.saveToLocalStorage() }
     }
     addEventListeners() {
         this.oncontextmenu = () => { this.editContent() }
@@ -88,6 +89,7 @@ class TodoItem extends HTMLElement {
             this.classList.add('item-fade-out');
             this.addEventListener('animationend', () => {
                 this.remove();
+                todo_arrow.saveToLocalStorage();
             });
         }
     }
