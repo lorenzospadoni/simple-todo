@@ -23,7 +23,6 @@ class TodoArrow extends HTMLElement {
             if (newValue === 'overview') {
                 this.container.title_box.style.display = 'initial';
                 this.container.new_button.style.display = 'initial';
-
                 this.style.opacity = 0;
             } else if (newValue === 'single') {
                 this.container.title_box.style.display = 'none';
@@ -32,6 +31,7 @@ class TodoArrow extends HTMLElement {
             }
         }
     }
+    
 }
 
 customElements.define('todo-arrow', TodoArrow)
