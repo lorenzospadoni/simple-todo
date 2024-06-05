@@ -4,7 +4,8 @@ let list_items = document.querySelectorAll("todo-item");
 // const list_container = document.querySelector('todo-container > div');
 
 function initDraggable() {
-    let list_container = document.querySelector('todo-project > div');
+    // list_container: use querySelector for a single container and querySelectorAll for multiple
+    let list_container = document.querySelectorAll('todo-project > div'); 
     draggable = new Draggable.Sortable(( list_container ), {
         draggable : 'todo-item',
         mirror: {
@@ -24,7 +25,7 @@ function initDraggable() {
         },
     });
     
-    draggable.on('sortable:sorted', (evt) => {
+    draggable.on('sortable:sorted', ( evt ) => {
         console.log('sortable:sorted')
     })
     draggable.on('sortable:start', ( evt ) => {

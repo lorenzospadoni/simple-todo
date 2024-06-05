@@ -1,0 +1,27 @@
+.container-overview {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+}
+.container-overview > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.container-overview > button {
+    font-size: larger;
+    background-color: #eec4b1;
+    border: 1px solid #eec4b1;
+    width: 250px;
+    height: 40px;
+}
+
+.container-overview > button:hover {
+    background-color: #eee2b1;
+    border: 2px solid #eec4b1;
+}

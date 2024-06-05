@@ -2,6 +2,8 @@ class TodoProject extends HTMLElement {
     static observedAttributes = ["title", "state"];
     constructor() {
         super();
+        this.tags_appended = false;
+
         this.title_box = document.createElement('h2'); // tie this to a title attribute in the tag
         this.item_box = document.createElement('div');
         this.new_button = document.createElement('button');
@@ -17,9 +19,19 @@ class TodoProject extends HTMLElement {
     connectedCallback() {
         console.log('TodoProject added to document');
 
-        let tags = this.innerHTML;
-        this.innerHTML = ""; 
-        this.item_box.innerHTML = tags; // TODO: implement a setter for this
+        if (this.tags_appended === false) {
+            console.log('[project] is equal to false')
+            let tags = this.innerHTML;
+            this.innerHTML = ""; 
+            this.item_box.innerHTML = tags;
+            this.tags_appended = true;
+        } else if (this.tags_appended === true) {
+            console.log('[project] tags_appended is equal to true')
+            console.log('[project] tags_appended nothing to do')
+        } else {
+            throw new Error('[project] tags_appended has a value different from true/false: ' + this.tags_appended)
+        }
+ // TODO: implement a setter for this
 
         // item box is shared between the two states
         // this way I don't need to clone nodes and worry
@@ -33,8 +45,6 @@ class TodoProject extends HTMLElement {
         this.title_box.classList.add('title');
         this.item_box.classList.add('items')
         this.info_box.classList.add('info_box')
-        
-        initDraggable();
     }
     disconnectedCallback() {
         console.log('TodoProject remove from document');
@@ -48,13 +58,18 @@ class TodoProject extends HTMLElement {
     }
     attributeChangedCallback(name, oldValue, newValue) {
         if ( name === "state" ) {
+            console.log('[PROJECT] attribute ' + name + ' changed from ' + oldValue + ' to ' + newValue)
             if ( newValue === 'open' ) {
+                // destroyDraggable();
+                // initDraggable();
                 this.setStyleOpen();
                 console.log('open')
             } else if (newValue === 'closed') {
+                // destroyDraggable();
                 this.setStyleClosed();
                 console.log('closed');
             } else if (newValue === 'hidden') {
+                // destroyDraggable();
                 this.setStyleHidden();
                 console.log('hidden');
             }
@@ -79,6 +94,9 @@ class TodoProject extends HTMLElement {
             let child_html = this.newChild();
             child_html.obj =  child_obj ;
         });
+    }
+    set title(new_title) {
+        this.title_box.innerContent = new_title;
     }
     setStyleOpen() {
         this.classList.add('project-open');

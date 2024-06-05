@@ -1,6 +1,6 @@
 const main_section = document.getElementById("main_section");
-const todo_obj = {
-    'title' : "My first todo project",
+const todo_obj = [{
+    'title' : "Saluti nel mondo",
     'children' : [
         {
             'content' : 'Hello!',
@@ -15,13 +15,48 @@ const todo_obj = {
             'checked' :  true
         }
     ] 
-};
+},
+{
+    'title' : "Come stai?",
+    'children' : [
+        {
+            'content' : 'Come stai?',
+            'checked' :  false
+        },        
+        {
+            'content' : 'How are you?!',
+            'checked' :  false
+        },
+        {
+            'content' : 'Comment ça va?',
+            'checked' :  false
+        }
+    ] 
+},
+{
+    'title' : "Buona sera nel mondo",
+    'children' : [
+        {
+            'content' : 'Buona sera!',
+            'checked' :  false
+        },        
+        {
+            'content' : 'Good evening!',
+            'checked' :  false
+        },
+        {
+            'content' : 'Bonsoir!',
+            'checked' :  false
+        }
+    ] 
+}
+];
 
 
-/* const todo_container0 = document.createElement( 'todo-container' );
+const todo_container0 = document.createElement( 'todo-container' );
 main_section.appendChild( todo_container0 );
+console.log(todo_obj)
 todo_container0.obj = todo_obj ;
- */
 
 // using querySelectorAll because Draggable wants a Node_List, not an HTMLCollection
 /* const list_items = document.querySelectorAll("todo-item");
