@@ -8,8 +8,7 @@ body {
 }
 
 header {
-  /* position:absolute;
-  top: 0px; */  
+    position: relative;
     height: 100px;
     width: 100%;
     background-color: grey;
