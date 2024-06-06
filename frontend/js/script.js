@@ -1,67 +1,9 @@
 const main_section = document.getElementById("main_section");
-const todo_arrow = document.querySelector('todo-arrow');
-const todo_obj = [{
-    'title' : "Saluti nel mondo",
-    'children' : [
-        {
-            'content' : 'Hello!',
-            'checked' :  false
-        },        
-        {
-            'content' : 'Ciao!',
-            'checked' :  false
-        },
-        {
-            'content' : 'Bonjour!',
-            'checked' :  true
-        }
-    ] 
-},
-{
-    'title' : "Come stai?",
-    'children' : [
-        {
-            'content' : 'Come stai?',
-            'checked' :  false
-        },        
-        {
-            'content' : 'How are you?!',
-            'checked' :  false
-        },
-        {
-            'content' : 'Comment ça va?',
-            'checked' :  false
-        }
-    ] 
-},
-{
-    'title' : "Buona sera nel mondo",
-    'children' : [
-        {
-            'content' : 'Buona sera!',
-            'checked' :  false
-        },        
-        {
-            'content' : 'Good evening!',
-            'checked' :  false
-        },
-        {
-            'content' : 'Bonsoir!',
-            'checked' :  false
-        }
-    ] 
-}
-];
-
-
-const container = document.createElement( 'todo-container' );
+const arrow = document.querySelector('todo-arrow');
+const container = document.createElement( 'todo-container');
+const navbar = document.querySelector('todo-navbar');
 main_section.appendChild( container );
-console.log(todo_obj)
-// todo_container0.obj = todo_obj ;
 
-const STATE_MANAGER = new StateManager;
-STATE_MANAGER.container = container;
-STATE_MANAGER.arrow = todo_arrow;
-STATE_MANAGER.getFromLocalStorage();
-STATE_MANAGER.state = 'overview'; // needed to stop the arrow from appearing on start up
+const STATE_MANAGER = new StateManager(container, arrow, navbar, 0);
+ // needed to stop the arrow from appearing on start up
 

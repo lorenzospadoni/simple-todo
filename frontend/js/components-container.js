@@ -7,7 +7,7 @@ class TodoContainer extends HTMLElement {
         this.tags_appended = false;
 
         this.title_box = document.createElement('h1');
-        this.project_box = document.createElement('div');
+        this.item_box = document.createElement('div');
         this.new_button = document.createElement('button');
 
         this.new_button.onclick = () => { this.newChild() }
@@ -19,7 +19,7 @@ class TodoContainer extends HTMLElement {
             console.log('[container] tags_appended is equal to false')
             let tags = this.innerHTML;
             this.innerHTML = ""; 
-            this.project_box.innerHTML = tags;
+            this.item_box.innerHTML = tags;
         } else if (this.tags_appended === true) {
             console.log('[container] tags_appended is equal to true')
             console.log('[container] nothing to do')
@@ -31,7 +31,7 @@ class TodoContainer extends HTMLElement {
         this.new_button.innerText = 'Create a new project';
     
         this.appendChild(this.title_box);
-        this.appendChild(this.project_box);
+        this.appendChild(this.item_box);
         this.appendChild(this.new_button);
 
         this.setDoubleClick();
@@ -59,7 +59,7 @@ class TodoContainer extends HTMLElement {
         }
     }
     setDoubleClick() {
-        let children = Array.prototype.slice.call(this.project_box.children);
+        let children = Array.prototype.slice.call(this.item_box.children);
         children.forEach( ( child ) => {
             child.ondblclick = () => { 
                 this.openProject( child );
@@ -68,13 +68,13 @@ class TodoContainer extends HTMLElement {
         });
     }
     setChildrenStateOverview() {
-        let children = Array.prototype.slice.call(this.project_box.children);
+        let children = Array.prototype.slice.call(this.item_box.children);
         children.forEach( ( child ) => {
             child.setAttribute('state', 'closed');
         });
     }
     openProject( elem ) {
-        let children = Array.prototype.slice.call(this.project_box.children);
+        let children = Array.prototype.slice.call(this.item_box.children);
         children.forEach( ( child ) => {
             child.setStyleHidden();
         });
@@ -84,7 +84,7 @@ class TodoContainer extends HTMLElement {
     newChild() {
         let new_child = document.createElement('todo-project');
         new_child.setAttribute('state', 'closed');
-        this.project_box.appendChild(new_child);
+        this.item_box.appendChild(new_child);
         this.setDoubleClick();
         new_child.title_box.contentEditable = true;
         new_child.title_box.focus();
@@ -93,11 +93,18 @@ class TodoContainer extends HTMLElement {
                 new_child.remove();
                 this.setAttribute('state', 'overview')
             } else {
-                STATE_MANAGER.saveToLocalStorage();
+                try {
+                    STATE_MANAGER.saveToLocalStorage();
+                } catch (ReferenceError) {
+                    console.log("[CONTAINER] caught ReferenceError: this is normal if it's happening on startup and web app runs smoothly")
+                }
             }
         }
 
         return new_child;
+    }
+    get item_array() {
+        return Array.prototype.slice.call(this.item_box.children);
     }
     set obj(container_object) {
         container_object.forEach((project) => {
@@ -107,7 +114,7 @@ class TodoContainer extends HTMLElement {
     }
     get obj() {
         let data = [];
-        let children = Array.prototype.slice.call(this.project_box.children);
+        let children = Array.prototype.slice.call(this.item_box.children);
         children.forEach( ( child ) => {
             data.push(child.obj);
         });

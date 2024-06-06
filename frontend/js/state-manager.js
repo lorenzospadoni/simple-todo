@@ -1,8 +1,18 @@
 class StateManager {
-    constructor() {
-        this._container = null;
-        this._arrow = null;
+    constructor(_container, _arrow, _navbar) {
+        this._container = _container;
+        this._arrow = _arrow;
+        this._navbar = _navbar;
         this._state = 0;
+
+        this._arrow.container = this._container;
+        this._navbar.container = this._container;
+
+        this.getFromLocalStorage();
+
+        this._navbar.updateContent();
+        this._arrow.initOnClick();
+
     }
     saveToLocalStorage() {
         let container_data = this.container.json;
@@ -20,6 +30,10 @@ class StateManager {
     handleStateSingle() {
         this.arrow.setAttribute('state', 'single');
         this.container.setAttribute('state', 'single');    
+    }
+    
+    updateNavbarContent() {
+        this.navbar.updateContent();
     }
 
     get state() {
@@ -44,12 +58,20 @@ class StateManager {
             throw new TypeError('state setter accepts either "overview"/0 or "single"/1');
         }
     }
+    get navbar() {
+        return this._navbar;
+    }
+    set navbar( el ) {
+        this._navbar = el;
+        this._navbar.container = this.container;
+    }
 
     get container() {
         return this._container;
     }
 
     set container( el ) {
+        // setter may be needed to perform extra actions later
         this._container = el;
     }
 
