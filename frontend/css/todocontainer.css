@@ -1,9 +1,6 @@
 .container-overview {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 6px;
+    width: 100%;
+    text-align: center;
 }
 .container-overview > div {
     display: flex;

@@ -57,6 +57,7 @@
     border-radius: 6px;
     min-height: 100px;
     min-width: 400px;
+    width: 90%;
 }
 .project-closed > .items {
     display:none;
