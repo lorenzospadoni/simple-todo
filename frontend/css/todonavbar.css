@@ -3,8 +3,8 @@ aside {
 }
 todo-navbar {
     display: block;
-    background-color: red;
     height: 100%;
+    margin-top: 50px;
 }
 todo-navbar > ul {
     padding-top: 4px;

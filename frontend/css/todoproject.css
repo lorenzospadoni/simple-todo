@@ -18,7 +18,7 @@
     inset: 0; */
 }
 
-.project-open > h2 {
+.project-open > h3 {
     text-align: center; 
     padding-block: 24px; 
     margin-top: 100px;
@@ -53,12 +53,22 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    border: 1px solid black;
+    border: 1px solid none;
     border-radius: 6px;
     min-height: 100px;
     min-width: 400px;
     width: 90%;
 }
+.project-closed:hover{
+    border: 1px solid black;
+}
+
+.project-closed > h3 {
+    font-size: 30px;
+    text-align: center; 
+    padding-block: 24px; 
+}
+
 .project-closed > .items {
     display:none;
 }

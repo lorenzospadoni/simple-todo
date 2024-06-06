@@ -6,7 +6,7 @@ class TodoContainer extends HTMLElement {
         super();
         this.tags_appended = false;
 
-        this.title_box = document.createElement('h1');
+        this.title_box = document.createElement('h2');
         this.item_box = document.createElement('div');
         this.new_button = document.createElement('button');
 

@@ -4,7 +4,7 @@ class TodoProject extends HTMLElement {
         super();
         this.tags_appended = false;
 
-        this.title_box = document.createElement('h2'); // tie this to a title attribute in the tag
+        this.title_box = document.createElement('h3'); // tie this to a title attribute in the tag
         this.item_box = document.createElement('div');
         this.new_button = document.createElement('button');
         this.info_box = document.createElement('div'); // this will contain how many items are left from item box
