@@ -5,6 +5,10 @@ html, * {
 
 body {
     background-color: #eee2b1;
+    display: grid;
+    grid-template-areas:
+        "header header header"
+        "main main sidebar";
 }
 
 header {
@@ -16,7 +20,8 @@ header {
     flex-direction: row;
     align-items: center;
     justify-content: space-around;
-    margin-bottom: 12px;
+    /* margin-bottom: 12px; */
+    grid-area: header;
 }
 
 header > h1 {
@@ -38,6 +43,11 @@ main {
   align-items: center;
   justify-content: center;
   gap: 6px;
+  grid-area: main;
+}
+
+aside {
+    grid-area: sidebar;
 }
 
 

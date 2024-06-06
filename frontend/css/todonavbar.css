@@ -1,0 +1,28 @@
+aside {
+    min-height: 100vh;
+}
+todo-navbar {
+    display: block;
+    background-color: red;
+    height: 100%;
+}
+todo-navbar > ul {
+    padding-top: 4px;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+}
+todo-navbar > ul > li {
+    text-align: center;
+    display: block;
+    border: 1px solid black;
+    height: 40px;
+    width: 98%;
+    font-size: 30px;
+    display: flex;
+    align-items:center;
+    justify-content: center;
+}
