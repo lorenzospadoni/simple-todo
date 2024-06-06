@@ -63,7 +63,7 @@ class TodoContainer extends HTMLElement {
         children.forEach( ( child ) => {
             child.ondblclick = () => { 
                 this.openProject( child );
-                todo_arrow.setAttribute('state', 'single')
+                STATE_MANAGER.state = 'single';
             }
         });
     }
@@ -93,7 +93,7 @@ class TodoContainer extends HTMLElement {
                 new_child.remove();
                 this.setAttribute('state', 'overview')
             } else {
-                todo_arrow.saveToLocalStorage();
+                STATE_MANAGER.saveToLocalStorage();
             }
         }
 

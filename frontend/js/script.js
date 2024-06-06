@@ -59,7 +59,9 @@ main_section.appendChild( container );
 console.log(todo_obj)
 // todo_container0.obj = todo_obj ;
 
-todo_arrow.container = container;
-todo_arrow.getFromLocalStorage();
-todo_arrow.setAttribute('state', 'overview'); // needed to stop the arrow from appearing on start up
+const STATE_MANAGER = new StateManager;
+STATE_MANAGER.container = container;
+STATE_MANAGER.arrow = todo_arrow;
+STATE_MANAGER.getFromLocalStorage();
+STATE_MANAGER.state = 'overview'; // needed to stop the arrow from appearing on start up
 
