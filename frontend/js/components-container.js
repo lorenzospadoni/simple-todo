@@ -92,10 +92,13 @@ class TodoContainer extends HTMLElement {
         new_child.title_box.onblur = () => { 
             if (new_child.title_box.textContent == "") {
                 new_child.remove();
-                this.setAttribute('state', 'overview')
+                STATE_MANAGER.saveToLocalStorage();
+                STATE_MANAGER.updateNavbarContent();
+                STATE_MANAGER.state = 'overview';
             } else {
                 try {
                     STATE_MANAGER.saveToLocalStorage();
+                    STATE_MANAGER.updateNavbarContent();
                 } catch (ReferenceError) {
                     console.log("[CONTAINER] caught ReferenceError: this is normal if it's happening on startup and web app runs smoothly")
                 }
