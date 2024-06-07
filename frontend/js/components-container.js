@@ -12,6 +12,7 @@ class TodoContainer extends HTMLElement {
 
         this.new_button.onclick = () => { this.newChild() }
 
+        this._draggable = null;
     }
 
     connectedCallback()   {       
@@ -102,6 +103,71 @@ class TodoContainer extends HTMLElement {
         }
 
         return new_child;
+    }
+    initDraggable() {
+        // list_container: use querySelector for a single container and querySelectorAll for multiple
+        this._draggable = new Draggable.Sortable(( this.item_box ), {
+            draggable : '.project-closed',
+            mirror: {
+                constrainDimensions: true,
+                create: (originalElement) => {
+                    const mirror = originalElement.cloneNode(true);
+                    // Ensure the content is fully cloned
+                    mirror.style.position = 'absolute';
+                    mirror.style.pointerEvents = 'none';
+                    document.body.appendChild(mirror);
+                    return mirror;
+                }
+            },
+            classes: {
+                'source:dragging': 'is-dragging',
+                'mirror': 'is-mirror',
+            },
+            plugins: [
+                Draggable.Plugins.SortAnimation
+            ],
+        
+            swapAnimation: {
+              duration: 200,
+              easingFunction: 'ease-in-out',
+            },
+        });
+        
+        this._draggable.on('sortable:sorted', ( evt ) => {
+            console.log('sortable:sorted')
+        })
+        this._draggable.on('sortable:start', ( evt ) => {
+            console.log('sortable:start', evt);
+            is_dragging = true;
+        })
+        
+        this._draggable.on('sortable:move', (evt) => {
+            console.log('sortable:move', evt);
+        });
+        
+        this._draggable.on('sortable:stop', (evt) => {
+            console.log('sortable:stop', evt);
+            is_dragging = false;
+        });
+    }
+    destroyDraggable() {
+        if (this._draggable) {
+            // Remove all event listeners
+            this._draggable.off('sortable:sorted');
+            this._draggable.off('sortable:start');
+            this._draggable.off('sortable:move');
+            this._draggable.off('sortable:stop');
+    
+            // Clean up any draggable-specific attributes or styles (if necessary)
+            document.querySelectorAll('todo-project').forEach(project => {
+                project.removeAttribute('draggable');
+                project.classList.remove('is-dragging', 'is-mirror');
+            });
+    
+            // Destroy the draggable instance
+            this._draggable.destroy();
+            this._draggable = null;
+        }
     }
     get item_array() {
         return Array.prototype.slice.call(this.item_box.children);

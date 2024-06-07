@@ -1,5 +1,5 @@
 class StateManager {
-    constructor(_container, _arrow, _navbar) {
+    constructor(_container, _arrow, _navbar, startup_routine) {
         this._container = _container;
         this._arrow = _arrow;
         this._navbar = _navbar;
@@ -8,11 +8,16 @@ class StateManager {
         this._arrow.container = this._container;
         this._navbar.container = this._container;
 
+        if (startup_routine === true) {
+            this.startUpRoutine();
+        }
+
+    }
+    startUpRoutine() {
         this.getFromLocalStorage();
 
         this._navbar.updateContent();
         this._arrow.initOnClick();
-
     }
     saveToLocalStorage() {
         let container_data = this.container.json;
@@ -21,6 +26,9 @@ class StateManager {
     getFromLocalStorage() {
         let data = localStorage.getItem('data');
         this.container.json = data;
+    }
+    cleanLocalStorage() {
+        localStorage.setItem('data', '[]')
     }
 
     handleStateOverview() {
