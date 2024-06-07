@@ -87,6 +87,8 @@ class TodoContainer extends HTMLElement {
         new_child.setAttribute('state', 'closed');
         this.item_box.appendChild(new_child);
         this.setDoubleClick();
+        // TODO: this should only be invoked to create projects for the user
+        // if that's not the case just append the element
         new_child.title_box.contentEditable = true;
         new_child.title_box.focus();
         new_child.title_box.onblur = () => { 
