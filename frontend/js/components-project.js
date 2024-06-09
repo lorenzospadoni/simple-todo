@@ -97,10 +97,12 @@ class TodoProject extends HTMLElement {
             } else if (newValue === 'closed') {
                 // destroyDraggable();
                 // this.title_box.contentEditable = false;
+                this.title_box.onclick = () => {}; // disables title editor on state change
                 this.setStyleClosed();
                 this.closeEditor();
                 console.log('closed');
             } else if (newValue === 'hidden') {
+                this.title_box.onclick = () => {}; // disables title editor on state change
                 // destroyDraggable();
                 this.setStyleHidden();
                 console.log('hidden');

@@ -10,7 +10,7 @@ class TodoContainer extends HTMLElement {
         this.item_box = document.createElement('div');
         this.new_button = document.createElement('button');
 
-        this.new_button.onclick = () => { this.newChild() }
+        this.new_button.onclick = () => { this.newChildUser() }
 
         this._draggable = null;
     }
@@ -89,16 +89,44 @@ class TodoContainer extends HTMLElement {
         this.setDoubleClick();
         // TODO: this should only be invoked to create projects for the user
         // if that's not the case just append the element
-        new_child.title_box.contentEditable = true;
-        new_child.title_box.focus();
-        new_child.title_box.onblur = () => { 
-            if (new_child.title_box.textContent == "") {
+        // new_child.title_box.contentEditable = true;
+        // new_child.title_box.focus();
+        // new_child.title_box.onblur = () => { 
+        //     if (new_child.title_box.textContent == "") {
+        //         new_child.remove();
+        //         STATE_MANAGER.saveToLocalStorage();
+        //         STATE_MANAGER.updateNavbarContent();
+        //         STATE_MANAGER.state = 'overview';
+        //     } else {
+        //         try {
+        //             STATE_MANAGER.saveToLocalStorage();
+        //             STATE_MANAGER.updateNavbarContent();
+        //         } catch (ReferenceError) {
+        //             console.log("[CONTAINER] caught ReferenceError: this is normal if it's happening on startup and web app runs smoothly")
+        //         }
+        //     }
+        // }
+        return new_child;
+    }
+    newChildUser() {
+        let new_child = document.createElement('todo-project');
+        new_child.setAttribute('state', 'closed');
+        this.item_box.appendChild(new_child);
+        this.setDoubleClick();
+        // TODO: this should only be invoked to create projects for the user
+        // if that's not the case just append the element
+        new_child.renderEditor();
+        new_child.edit_field.focus();
+        new_child.edit_field.onblur = () => { 
+            if (new_child.editorIsEmpty() === true) {
                 new_child.remove();
                 STATE_MANAGER.saveToLocalStorage();
                 STATE_MANAGER.updateNavbarContent();
-                STATE_MANAGER.state = 'overview';
+                //STATE_MANAGER.state = 'overview';
             } else {
                 try {
+                    new_child.saveEditor();
+                    new_child.closeEditor();
                     STATE_MANAGER.saveToLocalStorage();
                     STATE_MANAGER.updateNavbarContent();
                 } catch (ReferenceError) {
@@ -106,9 +134,9 @@ class TodoContainer extends HTMLElement {
                 }
             }
         }
-
         return new_child;
     }
+
     initDraggable() {
         // list_container: use querySelector for a single container and querySelectorAll for multiple
         this._draggable = new Draggable.Sortable(( this.item_box ), {
