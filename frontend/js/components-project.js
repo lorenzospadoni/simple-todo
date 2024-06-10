@@ -11,6 +11,7 @@ class TodoProject extends HTMLElement {
         this.button_box = document.createElement('div');
         this.cancel_button = document.createElement('button');
         this.save_button = document.createElement('button');
+        this.menu_button = document.createElement('button');
 
         this.item_box = document.createElement('div');
         this.new_button = document.createElement('button');
@@ -21,6 +22,7 @@ class TodoProject extends HTMLElement {
             this.newChild()
         }
 
+        this.menu_button.innerText = '...'
         this.cancel_button.innerText = 'Cancel';
         this.save_button.innerText = 'Save';
 
@@ -69,9 +71,13 @@ class TodoProject extends HTMLElement {
         this.appendChild(this.new_button);
         this.appendChild(this.info_box);
 
+        this.new_button.classList.add('new-button')
         this.title_box.classList.add('title');
         this.item_box.classList.add('items');
         this.info_box.classList.add('info_box');
+
+        this.menu_button.classList.add('menu-button')
+        this.appendChild(this.menu_button);
 
     }
     disconnectedCallback() {
