@@ -6,7 +6,7 @@ class TodoArrow extends HTMLElement {
         super();        
     }
     connectedCallback() {
-        this.innerText = '<';
+        this.innerText = '< back';
     }
     disconnectedCallback() {
 

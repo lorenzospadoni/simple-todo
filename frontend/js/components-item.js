@@ -2,58 +2,59 @@ class TodoItem extends HTMLElement {
     constructor() {
         super();
 
-        this.label = document.createElement("label");
-        this.checkbox = document.createElement("input");
-        this.checkbox_styled = document.createElement('span');
-        this.paragraph = document.createElement("span");
+        this.label = document.createElement("span");
+        this.checkbox = document.createElement("button");
 
-        this.checkbox.type = "checkbox";
     }
 
     connectedCallback() {
         console.log('TodoItem added to document.');
         let text_content = this.textContent;
         this.textContent = "";
-        this.paragraph.textContent = text_content;
+        this.label.textContent = text_content;
 
+        this.appendChild(this.checkbox);
         this.appendChild(this.label);
-        this.label.appendChild(this.checkbox);
-        this.label.appendChild(this.checkbox_styled);
-        this.label.appendChild(this.paragraph);
+
 
         this.label.classList.add("todo-label");
-        this.checkbox_styled.classList.add('checkbox');
+        this.checkbox.classList.add('checkbox');
+        this.checkbox.classList.add('checkbox-not-checked');
         this.classList.add("list_item");
 
-        this.checkbox_styled.onmouseover = () => {
+        this.checkbox.onmouseover = () => {
             if (is_dragging === false) {
                 destroyDraggable();
             }
         };
 
-        this.checkbox_styled.onmouseout = () => {
+        this.checkbox.onmouseout = () => {
             if (is_dragging === false) {
                 initDraggable();
             }
         };
 
-        this.checkbox_styled.aoonclick = (event) => {
+        this.checkbox.onclick = (event) => {
             event.stopPropagation();
+            this.checkbox.classList.remove('checkbox-not-checked');
+            this.checkbox.classList.add('checkbox-checked');
+            this.classList.add('item-fade-out')
+
         };
 
-        this.paragraph.onmouseover = () => {
+        this.label.onmouseover = () => {
             if (is_dragging === false) {
                 destroyDraggable();
             }
         };
 
-        this.paragraph.onmouseout = () => {
+        this.label.onmouseout = () => {
             if (is_dragging === false) {
                 initDraggable();
             }
         };
 
-        this.paragraph.onclick = (event) => {
+        this.label.onclick = (event) => {
             event.preventDefault();
             event.stopPropagation();
             this.editContent();
@@ -82,12 +83,16 @@ class TodoItem extends HTMLElement {
         console.log(`Attribute ${name} has changed.`);
     }
     editContent() {
-        this.paragraph.contentEditable = true;
-        this.paragraph.focus();
-        this.paragraph.onblur = () => { STATE_MANAGER.saveToLocalStorage() }
+        this.label.contentEditable = true;
+        this.label.focus();
+        this.label.onblur = () => { STATE_MANAGER.saveToLocalStorage() }
     }
     addEventListeners() {
         this.oncontextmenu = () => { this.editContent() }
+        this.addEventListener('animationend', () => {
+            this.remove();
+            STATE_MANAGER.saveToLocalStorage();
+        });
     }
     handleCheckboxChange(isChecked) {
         if (isChecked) {
@@ -100,11 +105,11 @@ class TodoItem extends HTMLElement {
     }
     get obj() {
         return {
-            'content' : this.paragraph.textContent,
+            'content' : this.label.textContent,
         }
     }
     set obj( object_arg ) {
-        this.paragraph.textContent = object_arg.content;
+        this.label.textContent = object_arg.content;
     }
 }
 

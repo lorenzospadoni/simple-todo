@@ -1,108 +1,92 @@
 todo-item {
     border: 1px solid black;
     border-radius: 6px;
-    height: 100px;
-    width: 400px;
+    height: 50px;
+    width: 100%;
+    margin-inline: 8px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start; /* Align items to the start */
     cursor: pointer;
     font-size: 22px;
     user-select: none;
     text-align: center;
     background-color: #eee2b1;
+    position: relative;
+    gap: 10px; /* Add some space between the checkbox and the label */
 }
-  
+
 todo-item.is-mirror {
     box-shadow: 0px 0px 30px 2px black;
 }
+
 todo-item.is-dragging {
     background-color: darkgrey;
 }
-  
+
 .todo-label {
     position: relative;
     display: flex;
     align-items: center;
 }
-  
-.todo-label input {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-    height: 0;
-    width: 0;
-}
-  
+
 .checkbox {
-    position: absolute;
-    top: 0;
-    left: -35px;
     height: 25px;
     width: 25px;
+    border: 1px solid #eee;
+    position: relative;
+    margin-left: 15px;
+}
+
+.checkbox-not-checked {
+    background-color: white;
+}
+.checkbox-not-checked:hover {
     background-color: #eee;
 }
-  
-.todo-label:hover input ~ .checkbox {
-    background-color: #ccc;
-}
-  
-.todo-label input:checked ~ .checkbox {
+
+.checkbox-checked {
     background-color: #2196F3;
 }
-  
-.checkbox:after {
+/* Create checkbox indicator */
+.checkbox-checked:after {
     content: "";
     position: absolute;
-    display: none;
-}
-  
-.todo-label input:checked ~ .checkbox:after {
     display: block;
-}
-  
-.todo-label .checkbox:after {
-    left: 9px;
-    top: 5px;
+    left: 8px;
+    top: 1px;
     width: 5px;
-    height: 10px;
+    height: 14px;
     border: solid white;
     border-width: 0 3px 3px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
     transform: rotate(45deg);
 }
-  
+
+/* Style the checkmark/indicator */
 todo-item > div {
     display: flex;
     flex-direction: column;
     gap: 12px;
 }
 
-todo-item > button {
-    border: 1px solid black;
-    border-radius: 6px;
-    height: 100px;
-    width: 400px;
-    display: flex;
-    align-items:center;
-    justify-content: center;
-    position: relative;
-  /*     padding-left: 35px;
-  margin-bottom: 12px; */
-    cursor: pointer;
-    font-size: 22px;
-    user-select: none;
-    text-align: center;
-}
-
 @keyframes fadeOut {
-    from {
+    0% {
         opacity: 1;
-    } to {
+    }
+    50% {
+        opacity: 0.5;
+        text-decoration-line: line-through;
+        color: grey;
+        background-color: #eee;
+    }
+    100% {
         opacity: 0;
     }
 }
+
 .item-fade-out {
     animation-name: fadeOut;
     animation-duration: 1s;
 }
-  

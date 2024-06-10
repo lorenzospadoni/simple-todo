@@ -1,3 +1,10 @@
+todo-container{
+    width: 100%;
+}
+todo-container > div {
+    width: 100%;
+}
+
 todo-container > h2 {
     line-height: 53px;
 }
