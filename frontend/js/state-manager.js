@@ -25,8 +25,11 @@ class StateManager {
     }
     getFromLocalStorage() {
         let data = localStorage.getItem('data');
+        if (data === null) {
+            data = '[]';
+        }
         this.container.json = data;
-    }mondo
+    }
     cleanLocalStorage() {
         localStorage.setItem('data', '[]')
     }
