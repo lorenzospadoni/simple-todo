@@ -204,6 +204,11 @@ class TodoProject extends HTMLElement {
         this.title_box.style.display = 'none';
         this.edit_box.style.display = 'flex';
         this.edit_field.value = this.title_box.textContent;
+        this.edit_field.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                this.save_button.click();
+            }
+        })
         this.edit_field.onkeyup = () => {
             if (this.editorIsEmpty() === true) {
                 this.save_button.disabled = true;
