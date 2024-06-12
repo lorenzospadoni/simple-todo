@@ -1,0 +1,16 @@
+project-menu {
+    display: none;
+    width: 100%;
+    min-height: 30px;
+}
+
+project-menu > button {
+    width: 100%;
+    border: 1px solid transparent;
+    font-size: 20px;
+    height: 30px;
+    background-color: #e7ddb3;
+}
+project-menu > button:hover {
+    background-color: #726c56;
+}

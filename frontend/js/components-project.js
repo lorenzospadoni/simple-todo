@@ -11,7 +11,11 @@ class TodoProject extends HTMLElement {
         this.button_box = document.createElement('div');
         this.cancel_button = document.createElement('button');
         this.save_button = document.createElement('button');
+
         this.menu_button = document.createElement('button');
+        this.menu_section = document.createElement('section');
+        this.edit_button = document.createElement('button');
+        this.delete_button = document.createElement('button');
 
         this.item_box = document.createElement('div');
         this.new_button = document.createElement('button');
@@ -22,7 +26,8 @@ class TodoProject extends HTMLElement {
             this.newChild()
         }
 
-        this.menu_button.innerText = '...'
+
+
         this.cancel_button.innerText = 'Cancel';
         this.save_button.innerText = 'Save';
 
@@ -36,6 +41,18 @@ class TodoProject extends HTMLElement {
 
         this.closeEditor();
 
+        this.menu_button.innerText = '...'
+        this.menu = document.createElement('project-menu');
+        this.menu_button.onclick = () => {
+            let current_state = this.menu.getAttribute('state');
+            if (current_state === 'open') {
+                this.closeMenu();
+            } else if (current_state === 'closed') {
+                this.openMenu();
+            } else {
+                throw new Error('[PROJECT MENU] menu state is neither closed nor open');
+            }
+        }
     }
     connectedCallback() {
         console.log('TodoProject added to document');
@@ -70,14 +87,19 @@ class TodoProject extends HTMLElement {
         this.appendChild(this.item_box);
         this.appendChild(this.new_button);
         this.appendChild(this.info_box);
+        this.appendChild(this.menu);
 
         this.new_button.classList.add('new-button')
         this.title_box.classList.add('title');
         this.item_box.classList.add('items');
         this.info_box.classList.add('info_box');
 
-        this.menu_button.classList.add('menu-button')
+        this.menu_button.classList.add('menu-button');
+
         this.appendChild(this.menu_button);
+
+        this.menu.setAttribute('state', 'closed')
+        this.setMenuOnClicks();
 
     }
     disconnectedCallback() {
@@ -179,6 +201,7 @@ class TodoProject extends HTMLElement {
         return !hasLettersOrNumbers;
     }
     renderEditor() {
+        this.title_box.style.display = 'none';
         this.edit_box.style.display = 'flex';
         this.edit_field.value = this.title_box.textContent;
         this.edit_field.onkeyup = () => {
@@ -191,6 +214,7 @@ class TodoProject extends HTMLElement {
 
     }
     closeEditor() {
+        this.title_box.style.display = 'block';
         this.edit_box.style.display = 'none';
     }
     saveEditor() {
@@ -198,6 +222,27 @@ class TodoProject extends HTMLElement {
         STATE_MANAGER.saveToLocalStorage();
         STATE_MANAGER.updateNavbarContent();
         this.closeEditor();
+    }
+    safelyRemove() {
+        this.remove();
+        STATE_MANAGER.saveToLocalStorage();
+        STATE_MANAGER.updateNavbarContent();
+    }
+    setMenuOnClicks() {
+        this.menu.edit_button.onclick = () => {
+            this.renderEditor();
+        }
+        this.menu.delete_button.onclick = () => {
+            this.safelyRemove();
+        }
+    }
+    openMenu() {
+        this.menu_button.innerText = 'x';
+        this.menu.setAttribute('state', 'open');
+    }
+    closeMenu() {
+        this.menu_button.innerText = '...';
+        this.menu.setAttribute('state', 'closed')
     }
 }
 customElements.define('todo-project', TodoProject);

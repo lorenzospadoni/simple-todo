@@ -26,7 +26,7 @@ class StateManager {
     getFromLocalStorage() {
         let data = localStorage.getItem('data');
         this.container.json = data;
-    }
+    }mondo
     cleanLocalStorage() {
         localStorage.setItem('data', '[]')
     }

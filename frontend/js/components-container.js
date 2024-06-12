@@ -66,7 +66,19 @@ class TodoContainer extends HTMLElement {
                 this.openProject( child );
                 STATE_MANAGER.state = 'single';
             }
+            // next section is required to not trigger opening a project when double clicking the menu.
+            child.menu_button.onmouseover = () => {
+                console.log('[MENU_BUTTON] mouse over');
+                child.ondblclick = () => {};
+            }
+            child.menu_button.onmouseout =  () => {
+                console.log('[MENU_BUTTON] mouse out');
+                child.ondblclick = () => {
+                        this.openProject(child);
+                        STATE_MANAGER.state = 'single';
+                }}
         });
+
     }
     setChildrenStateOverview() {
         let children = Array.prototype.slice.call(this.item_box.children);
@@ -78,6 +90,7 @@ class TodoContainer extends HTMLElement {
         let children = Array.prototype.slice.call(this.item_box.children);
         children.forEach( ( child ) => {
             child.setStyleHidden();
+            child.closeMenu(); // required to close menus
         });
         elem.setAttribute('state', 'open');
         // elem.setStyleOpen();
