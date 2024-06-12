@@ -31,7 +31,7 @@ class StateManager {
         this.container.json = data;
     }
     cleanLocalStorage() {
-        localStorage.setItem('data', '[]')
+        localStorage.clear();
     }
 
     handleStateOverview() {
