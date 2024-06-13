@@ -15,7 +15,10 @@ class TodoNavbar extends HTMLElement {
     }
     updateContent() {
         this.cleanContent();
+        this.nav_header = document.createElement('h2');
+        this.nav_header.innerText = 'Projects';
         let nav_list = document.createElement('ul');
+        this.appendChild(this.nav_header);
         this.appendChild(nav_list);
         let children = this.container.item_array;
         children.forEach((child) => {

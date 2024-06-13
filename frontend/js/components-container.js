@@ -156,12 +156,14 @@ class TodoContainer extends HTMLElement {
             draggable : '.project-closed',
             mirror: {
                 constrainDimensions: true,
-                create: (originalElement) => {
-                    const mirror = originalElement.cloneNode(true);
+                create: () => {
+                    const mirror = document.createElement('h1');
+                    mirror.innerText = 'a cojone';
                     // Ensure the content is fully cloned
                     mirror.style.position = 'absolute';
                     mirror.style.pointerEvents = 'none';
                     document.body.appendChild(mirror);
+                    console.log('[MIRROR CREATED]: ' + mirror); 
                     return mirror;
                 }
             },
