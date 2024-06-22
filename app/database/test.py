@@ -1,3 +1,4 @@
 import users
 
-# your code goes here
+print(users.getUserFromUsername('bill_gates'))
+
