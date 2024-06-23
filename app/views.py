@@ -21,7 +21,8 @@ def loginPost():
         user = getUserFromUsername(username)
         login_user(user)
     elif attempt == False:
-        pass
+        response['login_successful'] = False
+        response['error'] = None
     return json.dumps(response)
 
 @current_app.route('/users/has_token', methods=['GET'])

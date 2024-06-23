@@ -118,16 +118,22 @@ def getUserFromUsername(username: str, filename = db_file) -> Union[User, None]:
     cursor.execute(query, args)
     record = cursor.fetchone()
     connection.close()
-    user = createUserObjectFromRecord(record)
-    return user
+    if record != None:
+        user = createUserObjectFromRecord(record)
+        return user
+    else:
+        return None
 
 def checkIfUserPasswordIsCorrect(username: str, password: str, filename = db_file) -> Union[bool, None]:
     '''Checks if there is an user record with the given username and tests its password against the
     given one'''
     user = getUserFromUsername(username, filename)
-    if user.password == password:
-        return True
-    elif user.password != password:
+    if user == None:
         return False
     else:
-        return None
+        if user.password == password:
+            return True
+        elif user.password != password:
+            return False
+        else:
+            raise TypeError('user.password is None')

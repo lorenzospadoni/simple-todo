@@ -35,6 +35,26 @@ export async function getUserData( domain ) {
     return result;
 }
 
+export async function loginUser(username, password, domain){
+    domain = removeSlash(domain);
+    const data = {
+        'username' : username,
+        'password' : password
+    }
+    const url = domain + '/users/login';
+    const options = {
+        method : 'POST',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    }
+    const response = await fetch(url, options)
+    const result = await response.json();
+    return result;
+}
+
 export async function logoutUser( domain ) {
     domain = removeSlash( domain );
     const url = domain + '/users/logout'
