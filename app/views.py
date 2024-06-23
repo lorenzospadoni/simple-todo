@@ -54,9 +54,18 @@ def logoutPost():
 @current_app.route('/users/current_user/data', methods=['GET'])
 def userDataGet():
     user_data = {
-        'username' : current_user.username,
-        'date_of_subscription': current_user.date_of_subscription
+        'username' : None,
+        'date_of_subscription': None,
+        'logged_in': None
     }
+    if current_user.is_anonymous == True:
+        user_data['logged_in'] = False
+    elif current_user.is_anonymous == False:
+        user_data['username'] = current_user.username
+        user_data['date_of_subscription'] = current_user.date_of_subscription
+        user_data['logged_in'] = True
+    else:
+        raise ValueError('current_user.is_anonymous is nor True nor False')
     return json.dumps(user_data)
 
 #TODO: finish this:
