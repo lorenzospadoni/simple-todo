@@ -50,3 +50,19 @@ def logoutPost():
     else:
         raise ValueError('current_user.is_authenticated has an invalid value')
     return json.dumps(response)
+
+@current_app.route('/users/current_user/data', methods=['GET'])
+def userDataGet():
+    user_data = {
+        'username' : current_user.username,
+        'date_of_subscription': current_user.date_of_subscription
+    }
+    return json.dumps(user_data)
+
+#TODO: finish this:
+@current_app.route('/users/unsubscribe', methods=['GET'])
+def unsubscribeUser():
+    if current_user.is_authenticated == True:
+        deleteUserFromId(current_user.id)
+        return
+    return
