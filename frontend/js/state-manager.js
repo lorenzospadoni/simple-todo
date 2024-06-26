@@ -1,8 +1,11 @@
 class StateManager {
-    constructor(_container, _arrow, _navbar, startup_routine) {
+    constructor(frontend, backend, _container, _arrow, _navbar, _section, startup_routine) {
+        this.frontend = frontend;
+        this.backend = backend;
         this._container = _container;
         this._arrow = _arrow;
         this._navbar = _navbar;
+        this._section = _section;
         this._state = 0;
 
         this._arrow.container = this._container;
@@ -18,6 +21,7 @@ class StateManager {
 
         this._navbar.updateContent();
         this._arrow.initOnClick();
+        this._section.renderData( this.backend );
     }
     saveToLocalStorage() {
         let container_data = this.container.json;
@@ -47,6 +51,9 @@ class StateManager {
         this.navbar.updateContent();
     }
 
+    updateSectionContent() {
+        this._section.renderData( this.backend )
+    }
     get state() {
         if ( this._state === 0 ) {
             return 'overview';
