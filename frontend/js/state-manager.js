@@ -1,4 +1,7 @@
-class StateManager {
+import { hasToken } from './users.js';
+import { redirectLogin } from './redirects.js';
+
+export default class StateManager {
     constructor(frontend, backend, _container, _arrow, _navbar, _section, startup_routine) {
         this.frontend = frontend;
         this.backend = backend;
@@ -53,6 +56,17 @@ class StateManager {
 
     updateSectionContent() {
         this._section.renderData( this.backend )
+    }
+    async isLoggedIn() {
+        let response = await hasToken( this.backend );
+        if (response.has_token === true) {
+            console.log('STATE MANAGER HAS TOKEN');
+        } else if (response.has_token === false) {
+            console.log('STATE MANAGER DOES NOT HAVE TOKEN');
+            redirectLogin(this.frontend);
+        } else {
+            console.log('STATE MANAGER HAS... ?');
+        }
     }
     get state() {
         if ( this._state === 0 ) {

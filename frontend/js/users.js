@@ -1,3 +1,5 @@
+import { BACKEND, FRONTEND } from './vars.js';
+
 function removeSlash( domain ) {
     let last_char = domain[domain.length]
     if (last_char === '/') {
@@ -55,7 +57,7 @@ export async function loginUser(username, password, domain){
     return result;
 }
 
-export async function logoutUser( domain ) {
+export async function logoutUser( domain = BACKEND ) {
     domain = removeSlash( domain );
     const url = domain + '/users/logout'
     const options = {
