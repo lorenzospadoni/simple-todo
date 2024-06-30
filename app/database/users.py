@@ -62,16 +62,21 @@ def createUserObjectFromRecord(record):
     user = User(id, username, password, date_of_subscription, is_active)
     return user
 
-def insertUser(username: str, password: str, is_active: bool, filename = db_file):
-    '''Add a new record into the users table'''
-    query = 'INSERT INTO users(username, password, date_of_subscription, is_active) VALUES(?,?,?,?)'
-    today = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%s')
-    args = (username, password, today, is_active, )
-    connection = sqlite3.connect(filename)
-    cursor = connection.cursor()
-    cursor.execute(query, args)
-    connection.commit()
-    connection.close()
+def insertUser(username: str, password: str, is_active: bool, filename = db_file) -> Union[int, None]:
+    try:
+        '''Add a new record into the users table'''
+        query = 'INSERT INTO users(username, password, date_of_subscription, is_active) VALUES(?,?,?,?)'
+        today = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%s')
+        args = (username, password, today, is_active, )
+        connection = sqlite3.connect(filename)
+        cursor = connection.cursor()
+        cursor.execute(query, args)
+        last_row = cursor.lastrowid
+        connection.commit()
+        connection.close()
+    except:
+        last_row = None
+    return last_row
 
 def deleteUserFromId(id: int, filename = db_file):
     '''Deletes a user record whose id matches the given id'''

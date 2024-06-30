@@ -1,4 +1,6 @@
 import sqlite3, datetime, json
+from typing import Union
+
 
 class Project:
     def __init__(self, id: int, owner: int, title: str, items: list, date_of_creation: str) -> object:
@@ -92,17 +94,20 @@ def removeTodoTables(filename: str = 'simple-todo.db'):
     dropProjectTable(filename)
     dropItemTable(filename)
 
-def addItem(owner: int, content: str, filename: str = 'simple-todo.db') -> int:
-    '''Adds an item to the database. Datetime is declared by the function'''
-    today_date = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%s')
-    query = 'INSERT INTO items(owner, content, date_of_creation) VALUES(?, ?, ?)'
-    connection = sqlite3.connect(filename)
-    cursor = connection.cursor()
-    cursor.execute(query, (owner, content, today_date))
-    row_id = cursor.lastrowid
-    connection.commit()
-    connection.close()
-    return row_id
+def addItem(owner: int, content: str, filename: str = 'simple-todo.db') -> Union[int, None]:
+    try:
+        '''Adds an item to the database. Datetime is declared by the function'''
+        today_date = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%s')
+        query = 'INSERT INTO items(owner, content, date_of_creation) VALUES(?, ?, ?)'
+        connection = sqlite3.connect(filename)
+        cursor = connection.cursor()
+        cursor.execute(query, (owner, content, today_date))
+        row_id = cursor.lastrowid
+        connection.commit()
+        connection.close()
+        return row_id
+    except:
+        return None
 
 def fetchItemFromId(item_id: int, filename: str = 'simple-todo.db'):
     '''Returns the item whose id matches the given item id'''
@@ -124,17 +129,20 @@ def deleteItem(id: int, filename: str = 'simple-todo.db'):
     connection.commit()
     connection.close()
 
-def addProject(owner: int, title:str, items: list, filename: str = 'simple-todo.db') -> int:
-    '''Adds an item to the database. Datetime is declared by the function'''
-    today_date = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%s')
-    query = 'INSERT INTO projects(owner, title, items, date_of_creation) VALUES(?, ?, ?, ?)'
-    connection = sqlite3.connect(filename)
-    cursor = connection.cursor()
-    cursor.execute(query, (owner, title, json.dumps(items), today_date))
-    last_row = cursor.lastrowid
-    connection.commit()
-    connection.close()
-    return last_row
+def addProject(owner: int, title:str, items: list, filename: str = 'simple-todo.db') -> Union[int, None]:
+    try:
+        '''Adds an item to the database. Datetime is declared by the function'''
+        today_date = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%s')
+        query = 'INSERT INTO projects(owner, title, items, date_of_creation) VALUES(?, ?, ?, ?)'
+        connection = sqlite3.connect(filename)
+        cursor = connection.cursor()
+        cursor.execute(query, (owner, title, json.dumps(items), today_date))
+        last_row = cursor.lastrowid
+        connection.commit()
+        connection.close()
+        return last_row
+    except:
+        return None
 
 def fetchItems(filename: str = 'simple-todo.db'):
     query = '''SELECT * FROM items'''
