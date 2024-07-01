@@ -1,6 +1,36 @@
 import sqlite3, datetime, json
 from typing import Union
 
+class Container(list):
+    ## Fix this
+    ## The objective of this class is to create an easier centralized way to handle position exchange
+    ## between two projects or two items
+    
+    def __init__(self, *args):
+        super().__init__(args)
+        self._owner = None
+    
+    @property
+    def owner(self):
+        return self._owner
+    @owner.setter
+    def owner(self, value:int):
+        self._owner = value
+    @property
+    def obj(self):
+        return self
+    @obj.setter
+    def obj(self, projects):
+        new_projects = ''
+    @property
+    def json(self):
+        return json.dumps(self.obj)
+    @json.setter
+    def json(self, value: str):
+        cont = json.loads(value)
+        self.obj = cont
+
+
 
 class Project:
     def __init__(self, id: int, owner: int, title: str, items: list, date_of_creation: str) -> object:
@@ -9,6 +39,16 @@ class Project:
         self.title = title
         self.items = items
         self.date_of_creation = date_of_creation
+    @property
+    def obj(self) -> dict:
+        children = []
+        for item in self.items:
+            children.append(item.obj)
+        representation = {
+            'title' : self.title,
+            'children' : children
+        }
+        return representation
     @staticmethod
     def fetchItemObjects(ids: list, filename: str = 'simple-todo.db'):
         query = 'SELECT * FROM items WHERE id = (?)'
@@ -43,6 +83,13 @@ class Item:
         date_of_creation: {self.date_of_creation}
 
         '''
+    @property
+    def obj(self) -> dict:
+        representation = {
+            'id' : self.id,
+            'content' : self.content            
+        }
+        return representation
 
 def createItemTable(filename: str = 'simple-todo.db' ):
     ''' Creates the database table for TodoItems '''
