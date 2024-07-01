@@ -9,6 +9,18 @@ class Project:
         self.title = title
         self.items = items
         self.date_of_creation = date_of_creation
+    @staticmethod
+    def fetchItemObjects(ids: list, filename: str = 'simple-todo.db'):
+        query = 'SELECT * FROM items WHERE id = (?)'
+        connection = sqlite3.connect(filename)
+        cursor = connection.cursor()
+        items = []
+        for id in ids:
+            cursor.execute(query, (id, ))
+            item = cursor.fetchone()
+            items.append(item)
+        connection.close()
+        return items
     def __repr__(self):
         return f'''[PROJECT]
         id: {self.id}
@@ -94,9 +106,9 @@ def removeTodoTables(filename: str = 'simple-todo.db'):
     dropProjectTable(filename)
     dropItemTable(filename)
 
-def addItem(owner: int, content: str, filename: str = 'simple-todo.db') -> Union[int, None]:
+def insertItem(owner: int, content: str, filename: str = 'simple-todo.db') -> Union[int, None]:
     try:
-        '''Adds an item to the database. Datetime is declared by the function'''
+        '''Inserts an item to the database. Datetime is declared by the function'''
         today_date = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%s')
         query = 'INSERT INTO items(owner, content, date_of_creation) VALUES(?, ?, ?)'
         connection = sqlite3.connect(filename)
@@ -109,16 +121,49 @@ def addItem(owner: int, content: str, filename: str = 'simple-todo.db') -> Union
     except:
         return None
 
+def fromRecordToItem(record: tuple):
+    '''Converts the output of sqlite to an Item object'''
+    id = record[0]
+    owner = record[1]
+    content = record[2]
+    date_of_creation = record[3]
+    item = Item(id, owner, content, date_of_creation)
+    return item
+
+def fromRecordsToItemCollection(records: tuple):
+    '''Converts the output of sqlite to a collection of Item objects'''
+    items = []
+    for record in records:
+        item = fromRecordToItem(record)
+        items.append(item)
+    return items
+
+def fetchItems(filename: str = 'simple-todo.db'):
+    query = '''SELECT * FROM items'''
+    connection = sqlite3.connect(filename)
+    cursor = connection.cursor()
+    cursor.execute(query)
+    items_raw = cursor.fetchall()
+    items = fromRecordsToItemCollection(items_raw)
+    return items
+
 def fetchItemFromId(item_id: int, filename: str = 'simple-todo.db'):
     '''Returns the item whose id matches the given item id'''
     query = '''SELECT * FROM items WHERE id = (?)'''
-    args = (item_id)
+    args = (item_id, )
     connection = sqlite3.connect(filename)
     cursor = connection.cursor()
     cursor.execute(query, args)
-    item = cursor.fetchone()
+    item = fromRecordToItem(cursor.fetchone())
     connection.close()
     return item
+
+def fetchItemCollectionFromIds(ids:list, filename: str = 'simple-todo.db') -> list:
+    items = []
+    for id in ids:
+        item = fetchItemFromId(id, filename)
+        items.append(item)
+    return items
 
 def deleteItem(id: int, filename: str = 'simple-todo.db'):
     '''Deletes the record of an item whose id matches the given id argument'''
@@ -129,9 +174,9 @@ def deleteItem(id: int, filename: str = 'simple-todo.db'):
     connection.commit()
     connection.close()
 
-def addProject(owner: int, title:str, items: list, filename: str = 'simple-todo.db') -> Union[int, None]:
+def insertProject(owner: int, title:str, items: list, filename: str = 'simple-todo.db') -> Union[int, None]:
     try:
-        '''Adds an item to the database. Datetime is declared by the function'''
+        '''Inserts an item to the database. Datetime is declared by the function'''
         today_date = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%s')
         query = 'INSERT INTO projects(owner, title, items, date_of_creation) VALUES(?, ?, ?, ?)'
         connection = sqlite3.connect(filename)
@@ -144,17 +189,36 @@ def addProject(owner: int, title:str, items: list, filename: str = 'simple-todo.
     except:
         return None
 
-def fetchItems(filename: str = 'simple-todo.db'):
-    query = '''SELECT * FROM items'''
+def fromRecordToProject(record: tuple) -> Project:
+    '''Returns a Project object from sqlite output'''
+    id = record[0]
+    owner = record[1]
+    title = record[2]
+    items = fetchItemCollectionFromIds(json.loads(record[3]))
+    date_of_creation = record[4]
+    project = Project(id, owner, title, items, date_of_creation)
+    return project
+
+def fromRecordsToProjectCollection(records: tuple) -> list:
+    '''Returns a Project collection from sqlite output'''
+    projects = []
+    for record in records:
+        project = fromRecordToProject(record)
+        projects.append(project)
+    return projects
+
+def fetchProjectFromProjectId(project_id: int, filename: str = 'simple-todo.db') -> Union[int, None]:
+    '''Returns the project with the given id, returns None if none are found'''
+    query = 'SELECT * FROM projects WHERE id = (?)'
+    args = (project_id, )
     connection = sqlite3.connect(filename)
     cursor = connection.cursor()
-    cursor.execute(query)
-    items_raw = cursor.fetchall()
-    items = []
-    for item_raw in items_raw:
-        item = Item(item_raw[0], item_raw[1], item_raw[2], item_raw[3])
-        items.append(item)
-    return items
+    cursor.execute(query, args)
+    record = cursor.fetchone()
+    #return record[3]
+    project = fromRecordToProject(record)
+    connection.close()
+    return project
 
 def fetchProjectItems(project_id: int, owner_id:int, filename: str = 'simple-todo.db'):
     '''Returns all the items belonging to a project where the owner is the given's user'''
@@ -170,8 +234,8 @@ def fetchProjectItems(project_id: int, owner_id:int, filename: str = 'simple-tod
     items = []
     for item_id in item_ids:
         cursor.execute('SELECT * FROM items WHERE id = (?)', (item_id,))
-        item = cursor.fetchone()
-        item = Item(item[0], item[1], item[2], item[3])
+        record = cursor.fetchone()
+        item = fromRecordToItem(record)
         items.append(item)
     connection.close()
     return items
@@ -188,7 +252,8 @@ def fetchProjects(filename: str = 'simple-todo.db'):
         project = Project(project_raw[0], project_raw[1],project_raw[2],project_raw[3],project_raw[4])
         projects.append(project)
     return projects
-    
+
+
 
 def deleteProject(id, filename: str = 'simple-todo.db'):
     '''Deletes the record of a project whose id matches the given id argument'''
