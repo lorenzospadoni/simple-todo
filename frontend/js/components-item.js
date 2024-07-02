@@ -2,6 +2,7 @@ class TodoItem extends HTMLElement {
     constructor() {
         super();
 
+        this._id = null;
         this.label = document.createElement("span");
         this.checkbox = document.createElement("button");
 
@@ -105,10 +106,12 @@ class TodoItem extends HTMLElement {
     }
     get obj() {
         return {
+            'id' : this._id,
             'content' : this.label.textContent,
         }
     }
     set obj( object_arg ) {
+        this._id = object_arg.id
         this.label.textContent = object_arg.content;
     }
 }

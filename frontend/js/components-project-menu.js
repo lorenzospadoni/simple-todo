@@ -3,6 +3,9 @@ class ProjectMenu extends HTMLElement {
 
     constructor() {
         super();
+
+        this.id = null;
+
         this.project_element = null;
         this.container_element = null;
 

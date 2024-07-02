@@ -4,6 +4,8 @@ class TodoProject extends HTMLElement {
         super();
         this.tags_appended = false;
 
+        this._id = null;
+
         this.title_box = document.createElement('h3'); // tie this to a title attribute in the tag
         
         this.edit_box = document.createElement('div');
@@ -155,6 +157,7 @@ class TodoProject extends HTMLElement {
         }
     }
     set obj( object_arg ) {
+        this._id = object_arg.id
         this.title_box.textContent = object_arg.title;
         object_arg.children.forEach( ( child_obj ) => {
             let child_html = this.newChild();

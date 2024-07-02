@@ -2,19 +2,28 @@ from flask import request, json, current_app
 from flask_login import current_user, login_user, logout_user
 
 from database.users import *
+from database.todos import *
+
 
 @current_app.route('/todos', methods=['GET'])
 def getTodos():
-    response = [
-        {
-            'title' : 'Saluti nel mondo',
-            'children' : [
-                {'content' : 'Ciao'},
-                {'content' : 'Hello'},
-                {'content' : 'Bojour'}
-                ]
-        }
-    ]
+    # response = [
+    #     {   'id' : 3,
+    #         'title' : 'Saluti nel mondo',
+    #         'children' : [
+    #             {'id' : 3, 'content' : 'Ciao'},
+    #             {'id' : 4, 'content' : 'Hello'},
+    #             {'id' : 5, 'content' : 'Bojour'}
+    #             ]
+    #     }
+    # ]
+    if current_user.is_authenticated == True:
+        print(type(current_user.id))
+        projects = fetchProjectsFromUserId(current_user.id)
+        projects = convertProjectCollectionToList(projects)
+    else:
+        projects = []
+    response = json.dumps(projects)
     return json.dumps(response)
 
 @current_app.route('/users/login', methods=['POST'])

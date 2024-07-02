@@ -29,7 +29,7 @@ export default class StateManager {
     }
     async getSave() {
         let projects = await fetchProjects(this.backend)
-        this.container.obj = projects;
+        this.container.json = projects;
 
     } 
     postSave() {
