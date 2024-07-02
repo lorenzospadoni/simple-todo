@@ -1,4 +1,5 @@
 import StateManager from './state-manager.js';
+import { fetchProjects } from './todos.js';
 
 const FRONTEND = 'http://127.0.0.1:3000/';
 const BACKEND = 'http://127.0.0.1:5000/';
@@ -12,5 +13,7 @@ main_section.appendChild( container );
 
 const STATE_MANAGER = new StateManager(FRONTEND, BACKEND, container, arrow, navbar, section, true);
 STATE_MANAGER.isLoggedIn()
- // needed to stop the arrow from appearing on start up
+
+console.log(fetchProjects(BACKEND)) 
+// needed to stop the arrow from appearing on start up
 
