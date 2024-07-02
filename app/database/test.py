@@ -4,6 +4,6 @@ import todos
 # print(item.obj)
 #print(todos.fetchProjectFromProjectId(2))
 
-basket = todos.Container()
-basket.obj = ["apple", "mela", "pomme"]
-print(basket)
+# basket = todos.Container()
+# basket.obj = ["apple", "mela", "pomme"]
+# print(basket)

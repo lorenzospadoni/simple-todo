@@ -3,6 +3,19 @@ from flask_login import current_user, login_user, logout_user
 
 from database.users import *
 
+@current_app.route('/todos', methods=['GET'])
+def getTodos():
+    response = [
+        {
+            'title' : 'Saluti nel mondo',
+            'children' : [
+                {'content' : 'Ciao'},
+                {'content' : 'Hello'},
+                {'content' : 'Bojour'}
+                ]
+        }
+    ]
+    return json.dumps(response)
 
 @current_app.route('/users/login', methods=['POST'])
 def loginPost():
