@@ -11,8 +11,8 @@ const navbar = document.querySelector('todo-navbar');
 const section = document.querySelector('user-section');
 main_section.appendChild( container );
 
-const STATE_MANAGER = new StateManager(FRONTEND, BACKEND, container, arrow, navbar, section, true);
-STATE_MANAGER.isLoggedIn()
+const STATE_MANAGER = new StateManager(FRONTEND, BACKEND, container, arrow, navbar, section, false);
+STATE_MANAGER.startUpRoutine()
 
 console.log(fetchProjects(BACKEND)) 
 // needed to stop the arrow from appearing on start up

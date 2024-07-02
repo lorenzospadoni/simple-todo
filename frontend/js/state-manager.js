@@ -1,5 +1,6 @@
 import { hasToken } from './users.js';
 import { redirectLogin } from './redirects.js';
+import { fetchProjects } from './todos.js'
 
 export default class StateManager {
     constructor(frontend, backend, _container, _arrow, _navbar, _section, startup_routine) {
@@ -19,12 +20,20 @@ export default class StateManager {
         }
 
     }
-    startUpRoutine() {
-        this.getFromLocalStorage();
+    async startUpRoutine() {
+        this.getSave();
 
         this._navbar.updateContent();
         this._arrow.initOnClick();
         this._section.renderData( this.backend );
+    }
+    async getSave() {
+        let projects = await fetchProjects(this.backend)
+        this.container.obj = projects;
+
+    } 
+    postSave() {
+        this.saveToLocalStorage()
     }
     saveToLocalStorage() {
         let container_data = this.container.json;
