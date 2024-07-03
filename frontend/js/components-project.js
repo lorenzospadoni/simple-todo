@@ -8,6 +8,7 @@ export class TodoProject extends HTMLElement {
         this.tags_appended = false;
 
         this._id = null;
+        this.state_manager = null;
 
         this.title_box = document.createElement('h3'); // tie this to a title attribute in the tag
         
@@ -231,14 +232,14 @@ export class TodoProject extends HTMLElement {
     }
     saveEditor() {
         this.title_box.textContent = this.edit_field.value;
-        STATE_MANAGER.saveToLocalStorage();
-        STATE_MANAGER.updateNavbarContent();
+        this.state_manager.saveToLocalStorage();
+        this.state_manager.updateNavbarContent();
         this.closeEditor();
     }
     safelyRemove() {
         this.remove();
-        STATE_MANAGER.saveToLocalStorage();
-        STATE_MANAGER.updateNavbarContent();
+        this.state_manager.saveToLocalStorage();
+        this.state_manager.updateNavbarContent();
     }
     setMenuOnClicks() {
         this.menu.edit_button.onclick = () => {
