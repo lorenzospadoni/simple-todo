@@ -2,7 +2,7 @@ import { BACKEND, FRONTEND } from './vars.js';
 import { redirectLogout } from './redirects.js';
 import { hasToken, getUserData } from './users.js'
 
-class UserSection extends HTMLElement {
+export class UserSection extends HTMLElement {
     static observedAttributes = ['state']
     constructor() {
         super();
@@ -70,5 +70,5 @@ class UserSection extends HTMLElement {
         })
     }
 }
-customElements.define('user-section', UserSection);
+// customElements.define('user-section', UserSection);
 

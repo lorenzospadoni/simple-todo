@@ -1,5 +1,5 @@
-import { hasToken, logoutUser } from './users.js';
-import {redirectLogin } from './redirects.js'
+// import { hasToken, logoutUser } from './users.js';
+// import {redirectLogin } from './redirects.js'
 
 const FRONTEND = 'http://127.0.0.1:3000';
 const BACKEND = 'http://127.0.0.1:5000';

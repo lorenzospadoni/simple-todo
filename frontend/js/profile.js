@@ -1,5 +1,5 @@
-import { redirectLogin } from './redirects.js';
-import { hasToken, getUserData } from './users.js'
+// import { redirectLogin } from './redirects.js';
+// import { hasToken, getUserData } from './users.js'
 
 const username_field = document.getElementById('username_field');
 const date_field = document.getElementById('date_field');

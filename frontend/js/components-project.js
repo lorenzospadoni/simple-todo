@@ -1,4 +1,7 @@
-class TodoProject extends HTMLElement {
+// import { ProjectMenu } from './webcomponents.js'
+//customElements.define('project-menu', ProjectMenu);
+
+export class TodoProject extends HTMLElement {
     static observedAttributes = ["title", "state"];
     constructor() {
         super();
@@ -45,6 +48,7 @@ class TodoProject extends HTMLElement {
 
         this.menu_button.innerText = '...'
         this.menu = document.createElement('project-menu');
+        //this.menu = new ProjectMenu()
         this.menu_button.onclick = () => {
             let current_state = this.menu.getAttribute('state');
             if (current_state === 'open') {
@@ -253,4 +257,4 @@ class TodoProject extends HTMLElement {
         this.menu.setAttribute('state', 'closed')
     }
 }
-customElements.define('todo-project', TodoProject);
+// customElements.define('todo-project', TodoProject);

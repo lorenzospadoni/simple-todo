@@ -1,10 +1,10 @@
-class ProjectMenu extends HTMLElement {
+export class ProjectMenu extends HTMLElement {
     static observedAttributes = ['state'];
 
     constructor() {
         super();
 
-        this.id = null;
+        this._id = null;
 
         this.project_element = null;
         this.container_element = null;
@@ -51,4 +51,4 @@ class ProjectMenu extends HTMLElement {
     }
 }
 
-customElements.define('project-menu', ProjectMenu);
+// customElements.define('project-menu', ProjectMenu);

@@ -1,9 +1,10 @@
-class TodoArrow extends HTMLElement {
+export class TodoArrow extends HTMLElement {
 
     static observedAttributes = ['state'];
 
     constructor() {
-        super();        
+        super(); 
+        this.state_manager = null;       
     }
     connectedCallback() {
         this.innerText = '< back';
@@ -23,11 +24,11 @@ class TodoArrow extends HTMLElement {
     }
     initOnClick() {
         this.onclick = () => { 
-            STATE_MANAGER.state = 'overview';
+            this.state_manager.state = 'overview';
         }
     }
 
     
 }
 
-customElements.define('todo-arrow', TodoArrow)
+// customElements.define('todo-arrow', TodoArrow)

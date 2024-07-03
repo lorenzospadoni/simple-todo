@@ -1,10 +1,11 @@
-class TodoContainer extends HTMLElement {
+export class TodoContainer extends HTMLElement {
 
     static observedAttributes = ['state'];
 
     constructor() {
         super();
         this.tags_appended = false;
+        this.state_manager = null;
 
         this.title_box = document.createElement('h2');
         this.item_box = document.createElement('div');
@@ -64,7 +65,7 @@ class TodoContainer extends HTMLElement {
         children.forEach( ( child ) => {
             child.ondblclick = () => { 
                 this.openProject( child );
-                STATE_MANAGER.state = 'single';
+                this.state_manager.state = 'single';
             }
             // next section is required to not trigger opening a project when double clicking the menu.
             child.menu_button.onmouseover = () => {
@@ -75,7 +76,7 @@ class TodoContainer extends HTMLElement {
                 console.log('[MENU_BUTTON] mouse out');
                 child.ondblclick = () => {
                         this.openProject(child);
-                        STATE_MANAGER.state = 'single';
+                        this.state_manager.state = 'single';
                 }}
         });
 
@@ -107,13 +108,13 @@ class TodoContainer extends HTMLElement {
         // new_child.title_box.onblur = () => { 
         //     if (new_child.title_box.textContent == "") {
         //         new_child.remove();
-        //         STATE_MANAGER.saveToLocalStorage();
-        //         STATE_MANAGER.updateNavbarContent();
-        //         STATE_MANAGER.state = 'overview';
+        //         this.state_manager.saveToLocalStorage();
+        //         this.state_manager.updateNavbarContent();
+        //         this.state_manager.state = 'overview';
         //     } else {
         //         try {
-        //             STATE_MANAGER.saveToLocalStorage();
-        //             STATE_MANAGER.updateNavbarContent();
+        //             this.state_manager.saveToLocalStorage();
+        //             this.state_manager.updateNavbarContent();
         //         } catch (ReferenceError) {
         //             console.log("[CONTAINER] caught ReferenceError: this is normal if it's happening on startup and web app runs smoothly")
         //         }
@@ -133,15 +134,15 @@ class TodoContainer extends HTMLElement {
         new_child.edit_field.onblur = () => { 
             if (new_child.editorIsEmpty() === true) {
                 new_child.remove();
-                STATE_MANAGER.saveToLocalStorage();
-                STATE_MANAGER.updateNavbarContent();
-                //STATE_MANAGER.state = 'overview';
+                this.state_manager.saveToLocalStorage();
+                this.state_manager.updateNavbarContent();
+                //this.state_manager.state = 'overview';
             } else {
                 try {
                     new_child.saveEditor();
                     new_child.closeEditor();
-                    STATE_MANAGER.saveToLocalStorage();
-                    STATE_MANAGER.updateNavbarContent();
+                    this.state_manager.saveToLocalStorage();
+                    this.state_manager.updateNavbarContent();
                 } catch (ReferenceError) {
                     console.log("[CONTAINER] caught ReferenceError: this is normal if it's happening on startup and web app runs smoothly")
                 }
@@ -244,4 +245,4 @@ class TodoContainer extends HTMLElement {
 
 }
 
-customElements.define('todo-container', TodoContainer);
+// customElements.define('todo-container', TodoContainer);

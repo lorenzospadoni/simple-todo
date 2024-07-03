@@ -1,5 +1,26 @@
-import StateManager from './state-manager.js';
+//import StateManager from './state-manager.js';
 import { fetchProjects } from './todos.js';
+
+// import components
+import {
+    TodoArrow,
+    TodoContainer,
+    TodoItem,
+    TodoNavbar, 
+    ProjectMenu, 
+    TodoProject, 
+    UserSection, 
+    StateManager
+} from './webcomponents.js';
+
+customElements.define('todo-arrow', TodoArrow);
+customElements.define('todo-container', TodoContainer);
+customElements.define('todo-item', TodoItem);
+customElements.define('todo-navbar', TodoNavbar);
+customElements.define('project-menu', ProjectMenu);
+customElements.define('todo-project', TodoProject);
+customElements.define('user-section', UserSection);
+
 
 const FRONTEND = 'http://127.0.0.1:3000/';
 const BACKEND = 'http://127.0.0.1:5000/';

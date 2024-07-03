@@ -3,7 +3,7 @@ import { BACKEND, FRONTEND } from './vars.js';
 function removeSlash( domain ) {
     let last_char = domain[domain.length]
     if (last_char === '/') {
-        domain = domain.substring(0, domain.length - 1);
+        domain = domain.substring(0, domain.length);
     }
     return domain;
 }

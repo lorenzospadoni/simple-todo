@@ -2,7 +2,7 @@ import { hasToken } from './users.js';
 import { redirectLogin } from './redirects.js';
 import { fetchProjects } from './todos.js'
 
-export default class StateManager {
+export class StateManager {
     constructor(frontend, backend, _container, _arrow, _navbar, _section, startup_routine) {
         this.frontend = frontend;
         this.backend = backend;
@@ -23,6 +23,9 @@ export default class StateManager {
     async startUpRoutine() {
         this.getSave();
 
+        this._container.state_manager = this;
+        this._arrow.state_manager = this;
+        
         this._navbar.updateContent();
         this._arrow.initOnClick();
         this._section.renderData( this.backend );

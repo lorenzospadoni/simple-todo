@@ -1,4 +1,4 @@
-class TodoNavbar extends HTMLElement {
+export class TodoNavbar extends HTMLElement {
     constructor() {
         super();
 
@@ -46,4 +46,4 @@ class TodoNavbar extends HTMLElement {
 
 }
 
-customElements.define('todo-navbar', TodoNavbar);
+// customElements.define('todo-navbar', TodoNavbar);
