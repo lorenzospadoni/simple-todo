@@ -29,8 +29,27 @@ export async function postProjects(domain, obj) {
         headers: {
             'Content-Type' : 'application/json'
         },
-        body: json.stringify(obj),
+        body: JSON.stringify(obj),
         method: 'POST',
+        credentials: 'include'
+    }
+    const response = await fetch(url, options);
+    const result = response.json()
+    return result;
+}
+
+export async function deleteItem(domain, id) {
+    let obj = {
+        'id' : id
+    }
+    domain = removeSlash(domain);
+    const url = domain + '/todos/items';
+    const options = {
+        headers: {
+            'Content-Type' : 'application/json'
+        },
+        body: JSON.stringify(obj),
+        method: 'DELETE',
         credentials: 'include'
     }
     const response = await fetch(url, options);

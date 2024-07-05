@@ -54,6 +54,9 @@ class Project:
             'children' : children
         }
         return representation
+    @property
+    def item_list(self) -> list:
+        pass
     @staticmethod
     def fetchItemObjects(ids: list, filename: str = db_file):
         query = 'SELECT * FROM items WHERE id = (?)'
@@ -91,10 +94,11 @@ class Item:
     @property
     def obj(self) -> dict:
         representation = {
-            'id' : self.id,
-            'content' : self.content            
-        }
+                'id' : self.id,
+                'content' : self.content            
+            }
         return representation
+
 
 def createItemTable(filename: str = db_file ):
     ''' Creates the database table for TodoItems '''
@@ -239,16 +243,52 @@ def updateItemContent(id: int, content: str, filename: str = db_file):
 
 def deleteItem(id: int, filename: str = db_file):
     '''Deletes the record of an item whose id matches the given id argument'''
-    try:
-        query = '''DELETE FROM items WHERE id = (?)'''
-        connection = sqlite3.connect(filename)
-        cursor = connection.cursor()
-        cursor.execute(query, (id, ))
-        connection.commit()
-        connection.close()
-        return True
-    except:
-        return False
+    query = '''DELETE FROM items WHERE id = (?)'''
+    connection = sqlite3.connect(filename)
+    cursor = connection.cursor()
+    cursor.execute(query, (id, ))
+    connection.commit()
+    connection.close()
+    return True
+def findProjectWithItemId(item_id: int, filename: str = db_file):
+    '''Returns the id of the project that has a certain item id in its 'items' field'''
+    query = '''
+        SELECT projects.id
+        FROM projects, json_each(projects.items)
+        WHERE json_each.value = (?)
+    '''
+    connection = sqlite3.connect(filename)
+    cursor = connection.cursor()
+    cursor.execute(query, (item_id, ))
+    result = cursor.fetchone()
+    connection.commit()
+    connection.close()
+    return result[0]
+
+def removeItemIdFromProjectItems(item_id: int, project_id: int, filename: str = db_file):
+    query = '''
+        SELECT items FROM projects WHERE id=(?)
+    '''
+    args = (project_id, )
+    connection = sqlite3.connect(filename)
+    cursor = connection.cursor()
+    cursor.execute(query, args)
+    items = cursor.fetchone()
+    items = items[0]
+    items = json.loads(items)
+    items.remove(item_id)
+    items = json.dumps(items)
+    query = '''
+        UPDATE projects SET items = (?) WHERE id = (?)
+    '''
+    args = (items, project_id)
+    cursor.execute(query, args)
+    connection.commit()
+    connection.close()
+
+def removeItemIdFromProjects(item_id, filename: str = db_file):
+    project_id = findProjectWithItemId(item_id, filename)
+    removeItemIdFromProjectItems(item_id, project_id, filename)
 
 # Is this bad code?
 def userOwnsItem(user_id: int, item_id: int, filename: str = db_file) -> bool:
@@ -282,9 +322,12 @@ def insertProject(owner: int, title:str, items: list, filename: str = db_file) -
 
 def convertProjectCollectionToList(projects: list):
     coll = []
-    for project in projects:
-        coll_json = project.obj
-        coll.append(coll_json)
+    try:
+        for project in projects:
+            coll_json = project.obj
+            coll.append(coll_json)
+    except AttributeError:
+        pass
     return coll
 
 def fromRecordToProject(record: tuple) -> Project:

@@ -1,6 +1,6 @@
 import { hasToken } from './users.js';
 import { redirectLogin } from './redirects.js';
-import { fetchProjects, postProjects, postItemContentChange } from './todos.js'
+import { fetchProjects, postProjects, postItemContentChange, deleteItem } from './todos.js'
 
 export class StateManager {
     constructor(frontend, backend, _container, _arrow, _navbar, _section, startup_routine) {
@@ -48,6 +48,16 @@ export class StateManager {
         if (item._id != null) {
             this.handleItemContentChange(item)
         }
+    }
+    async handleDeleteItem(id) {
+        const response = deleteItem(this.backend, id)
+    }
+
+    deleteItemOnDb(item) {
+        if (item._id != null) {
+            this.handleDeleteItem(item._id)
+        }
+
     }
     saveToLocalStorage() {
         let container_data = this.container.json;

@@ -25,6 +25,20 @@ def handleItemsRequests():
             response['updated'] = False
     return json.dumps(response)
 
+@login_required
+@current_app.route('/todos/items', methods=['DELETE'])
+def handleItemsDelete():
+    data = request.json
+    response = {
+        'deleted' : None
+    }
+    if userOwnsItem(current_user.id, data.get('id')) == True:
+        response['deleted'] = True
+        removeItemIdFromProjects(data.get('id')) # this doesn't look safe at all lmao
+    else:
+        response['deleted'] = False
+    return json.dumps(response)
+
 @current_app.route('/todos', methods=['GET'])
 def getTodos():
     # response = [

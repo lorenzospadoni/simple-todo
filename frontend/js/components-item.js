@@ -95,7 +95,7 @@ export class TodoItem extends HTMLElement {
         this.oncontextmenu = () => { this.editContent() }
         this.addEventListener('animationend', () => {
             this.remove();
-            this.state_manager.saveToLocalStorage();
+            this.state_manager.deleteItemOnDb(this);
         });
     }
     handleCheckboxChange(isChecked) {
