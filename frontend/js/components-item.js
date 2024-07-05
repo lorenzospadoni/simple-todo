@@ -3,8 +3,11 @@ export class TodoItem extends HTMLElement {
         super();
 
         this._id = null;
+        this.state_manager = null;
+
         this.label = document.createElement("span");
         this.checkbox = document.createElement("button");
+
 
     }
 
@@ -86,13 +89,13 @@ export class TodoItem extends HTMLElement {
     editContent() {
         this.label.contentEditable = true;
         this.label.focus();
-        this.label.onblur = () => { STATE_MANAGER.saveToLocalStorage() }
+        this.label.onblur = () => { this.state_manager.postItemContentChange(this) }
     }
     addEventListeners() {
         this.oncontextmenu = () => { this.editContent() }
         this.addEventListener('animationend', () => {
             this.remove();
-            STATE_MANAGER.saveToLocalStorage();
+            this.state_manager.saveToLocalStorage();
         });
     }
     handleCheckboxChange(isChecked) {
@@ -100,7 +103,7 @@ export class TodoItem extends HTMLElement {
             this.classList.add('item-fade-out');
             this.addEventListener('animationend', () => {
                 this.remove();
-                STATE_MANAGER.saveToLocalStorage();
+                this.state_manager.saveToLocalStorage();
             });
         }
     }

@@ -21,3 +21,42 @@ export async function fetchProjects(domain) {
     const result = await response.json()
     return result
 }
+
+export async function postProjects(domain, obj) {
+    domain = removeSlash(domain);
+    const url = domain + '/todos';
+    const options = {
+        headers: {
+            'Content-Type' : 'application/json'
+        },
+        body: json.stringify(obj),
+        method: 'POST',
+        credentials: 'include'
+    }
+    const response = await fetch(url, options);
+    const result = response.json()
+    return result;
+}
+
+export async function postItemContentChange(domain, id, content) {
+    domain = removeSlash(domain);
+    const url = domain + '/todos/items';
+    console.log(url)
+    const request = {
+        operation_type : 'update_content',
+        id : id,
+        new_content : content
+    }
+    const options = {
+        headers: {
+            'Content-Type' : 'application/json'
+        },
+        body: JSON.stringify(request),
+        method: 'POST',
+        credentials: 'include'
+    }
+    const response = await fetch(url, options);
+    const result = response.json()
+    console.log(result)
+    return result;
+}

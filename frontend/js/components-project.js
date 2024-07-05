@@ -115,6 +115,7 @@ export class TodoProject extends HTMLElement {
     }
     newChild() {
         let el = document.createElement( 'todo-item' ); 
+        el.state_manager = this.state_manager
         this.item_box.appendChild( el ); 
         el.editContent();
         return el;
@@ -232,13 +233,13 @@ export class TodoProject extends HTMLElement {
     }
     saveEditor() {
         this.title_box.textContent = this.edit_field.value;
-        this.state_manager.saveToLocalStorage();
+        this.state_manager.postSave();
         this.state_manager.updateNavbarContent();
         this.closeEditor();
     }
     safelyRemove() {
         this.remove();
-        this.state_manager.saveToLocalStorage();
+        this.state_manager.postSave();
         this.state_manager.updateNavbarContent();
     }
     setMenuOnClicks() {

@@ -1,6 +1,6 @@
 import { hasToken } from './users.js';
 import { redirectLogin } from './redirects.js';
-import { fetchProjects } from './todos.js'
+import { fetchProjects, postProjects, postItemContentChange } from './todos.js'
 
 export class StateManager {
     constructor(frontend, backend, _container, _arrow, _navbar, _section, startup_routine) {
@@ -36,7 +36,18 @@ export class StateManager {
 
     } 
     postSave() {
-        this.saveToLocalStorage()
+        //this.saveToLocalStorage()
+        const projects = this.container.obj;
+        postProjects(this.backend, projects);
+        console.log('[postSave] POST request sent');
+    }
+    async handleItemContentChange(item) {
+        const response = postItemContentChange(this.backend, item._id, item.label.textContent)
+    }
+    postItemContentChange(item) {
+        if (item._id != null) {
+            this.handleItemContentChange(item)
+        }
     }
     saveToLocalStorage() {
         let container_data = this.container.json;

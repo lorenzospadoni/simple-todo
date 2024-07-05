@@ -1,9 +1,29 @@
 from flask import request, json, current_app
-from flask_login import current_user, login_user, logout_user
+from flask_login import current_user, login_user, logout_user, login_required
 
 from database.users import *
 from database.todos import *
 
+@login_required
+@current_app.route('/todos/items', methods=['POST'])
+def handleItemsRequests():
+    response = {
+        'updated' : None
+    }
+    data = request.json
+    subject = data.get('operation_type')
+    if subject == 'update_content':
+        item_id = data.get('id')
+        item_id = int(item_id)
+        user_id = current_user.id
+        new_content = data.get('new_content')
+        print(f'ITEM_ID : {item_id}\ntype: {type(item_id)}\nnew_content: {new_content}\ntype: {type(new_content)}\n')
+        if userOwnsItem(user_id, item_id) == True:
+            updateItemContent(item_id, new_content)
+            response['updated'] = True
+        else:
+            response['updated'] = False
+    return json.dumps(response)
 
 @current_app.route('/todos', methods=['GET'])
 def getTodos():

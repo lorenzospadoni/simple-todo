@@ -173,14 +173,20 @@ def insertItem(owner: int, content: str, filename: str = db_file) -> Union[int, 
     except:
         return None
 
-def fromRecordToItem(record: tuple):
-    '''Converts the output of sqlite to an Item object'''
-    id = record[0]
-    owner = record[1]
-    content = record[2]
-    date_of_creation = record[3]
-    item = Item(id, owner, content, date_of_creation)
-    return item
+def fromRecordToItem(record: tuple) -> Union[Item, None]:
+    '''Converts the output of sqlite to an Item object, returns None if not possible'''
+    try:
+        id = record[0]
+        owner = record[1]
+        content = record[2]
+        date_of_creation = record[3]
+        item = Item(id, owner, content, date_of_creation)
+        return item
+    except TypeError:
+        # TypeError occurs when id = record[0] is not possible because record is of type 'NoneType'
+        item = None
+    finally:
+        return item
 
 def fromRecordsToItemCollection(records: tuple):
     '''Converts the output of sqlite to a collection of Item objects'''
@@ -199,16 +205,20 @@ def fetchItems(filename: str = db_file):
     items = fromRecordsToItemCollection(items_raw)
     return items
 
-def fetchItemFromId(item_id: int, filename: str = db_file):
-    '''Returns the item whose id matches the given item id'''
-    query = '''SELECT * FROM items WHERE id = (?)'''
-    args = (item_id, )
-    connection = sqlite3.connect(filename)
-    cursor = connection.cursor()
-    cursor.execute(query, args)
-    item = fromRecordToItem(cursor.fetchone())
-    connection.close()
-    return item
+def fetchItemFromId(item_id: int, filename: str = db_file) -> Union[Item, None]:
+    '''Returns the item whose id matches the given item id, if none are found returns None'''
+    try:
+        query = '''SELECT * FROM items WHERE id = (?)'''
+        args = (item_id, )
+        connection = sqlite3.connect(filename)
+        cursor = connection.cursor()
+        cursor.execute(query, args)
+        item = fromRecordToItem(cursor.fetchone())
+        connection.close()
+        return item
+    except TypeError:
+        return None
+
 
 def fetchItemCollectionFromIds(ids:list, filename: str = db_file) -> list:
     items = []
@@ -217,14 +227,43 @@ def fetchItemCollectionFromIds(ids:list, filename: str = db_file) -> list:
         items.append(item)
     return items
 
-def deleteItem(id: int, filename: str = db_file):
-    '''Deletes the record of an item whose id matches the given id argument'''
-    query = '''DELETE FROM items WHERE id = (?)'''
+def updateItemContent(id: int, content: str, filename: str = db_file):
+    '''Changes an item's content'''
+    query = 'UPDATE items SET content = (?) WHERE id = (?)'
+    args = (content, id)
     connection = sqlite3.connect(filename)
     cursor = connection.cursor()
-    cursor.execute(query, (id, ))
+    cursor.execute(query, args)
     connection.commit()
     connection.close()
+
+def deleteItem(id: int, filename: str = db_file):
+    '''Deletes the record of an item whose id matches the given id argument'''
+    try:
+        query = '''DELETE FROM items WHERE id = (?)'''
+        connection = sqlite3.connect(filename)
+        cursor = connection.cursor()
+        cursor.execute(query, (id, ))
+        connection.commit()
+        connection.close()
+        return True
+    except:
+        return False
+
+# Is this bad code?
+def userOwnsItem(user_id: int, item_id: int, filename: str = db_file) -> bool:
+    '''Checks if a user with a certain user_id is the owner of an item in the db'''
+    try:
+        item = fetchItemFromId(item_id, filename)
+        if item.owner == user_id:
+            return True
+        else:
+            raise AttributeError
+    except AttributeError:
+        # AttributeError is raised either when you try to access item.owner but fetchItemFromId
+        # returned None or when the user is NOT the owner of the Item
+        return False
+        
 
 def insertProject(owner: int, title:str, items: list, filename: str = db_file) -> Union[int, None]:
     try:
@@ -289,7 +328,7 @@ def fetchProjectItems(project_id: int, owner_id:int, filename: str = db_file):
     item_ids = cursor.fetchone()
     item_ids = item_ids[0]
     item_ids = json.loads(item_ids)
-    print(type(item_ids[0]))
+    # print(type(item_ids[0]))
     items = []
     for item_id in item_ids:
         cursor.execute('SELECT * FROM items WHERE id = (?)', (item_id,))
@@ -321,7 +360,7 @@ def fetchProjectsFromUserId(id:int, filename: str = db_file):
     projects_raw = cursor.fetchall()
     connection.close()
     projects = fromRecordsToProjectCollection(projects_raw)
-    print(projects)
+    #print(projects)
     return projects
 
 
