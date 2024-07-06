@@ -3,6 +3,7 @@ import { redirectLogin } from './redirects.js';
 import { 
     fetchProjects, 
     postProjects,
+    postProjectNewTitle,
     postItem,
     postItemContentChange, 
     deleteItem 
@@ -46,6 +47,15 @@ export class StateManager {
         const projects = this.container.obj;
         postProjects(this.backend, projects);
         console.log('[postSave] POST request sent');
+    }
+
+    async handleProjectTitleChange(project) {
+        const response = postProjectNewTitle(this.backend, project._id, project.title_box.textContent);
+    }
+    postProjectTitleChange(project) {
+        if (project._id != null) {
+            this.handleProjectTitleChange(project);
+        }
     }
     async handleItemContentChange(item) {
         const response = postItemContentChange(this.backend, item._id, item.label.textContent)

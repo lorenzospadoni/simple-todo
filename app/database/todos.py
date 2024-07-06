@@ -339,6 +339,16 @@ def insertProject(owner: int, title:str, items: list, filename: str = db_file) -
     except:
         return None
 
+def updateProjectTitle(project_id: int, new_title: str, filename: str = db_file):
+    '''Updates the title of the project matching the given project id'''
+    query = 'UPDATE projects SET title = (?) WHERE id = (?)'
+    args = (new_title, project_id)
+    connection = sqlite3.connect(filename)
+    cursor = connection.cursor()
+    cursor.execute(query, args)
+    connection.commit()
+    connection.close()
+
 def convertProjectCollectionToList(projects: list):
     coll = []
     try:

@@ -53,6 +53,23 @@ def handleItemsDelete():
         response['deleted'] = False
     return json.dumps(response)
 
+@login_required
+@current_app.route('/todos/projects', methods=['POST'])
+def postProject():
+    response = {
+
+    }
+    data = request.json
+    if data.get('operation_type') == 'update_title':
+        project_id = data.get('project_id')
+        new_title = data.get('new_title')
+        if userOwnsProject(current_user.id, project_id) == True:
+            updateProjectTitle(project_id, new_title)
+            response['updated'] = True
+        else:
+            response['updated'] = False
+    return response
+
 @current_app.route('/todos', methods=['GET'])
 def getTodos():
     # response = [

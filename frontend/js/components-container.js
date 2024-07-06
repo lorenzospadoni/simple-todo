@@ -103,6 +103,10 @@ export class TodoContainer extends HTMLElement {
         new_child.new_button.onclick = () => {
             this.state_manager.postNewItemOnDb(new_child)
         }
+        // new_child.save_button.onclick = () => {
+        //     new_child.closeEditor();
+        //     this.state_manager.postProjectTitleChange(new_child);
+        // }
         new_child.setAttribute('state', 'closed');
         this.item_box.appendChild(new_child);
         this.setDoubleClick();

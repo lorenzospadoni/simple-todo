@@ -32,8 +32,6 @@ export class TodoProject extends HTMLElement {
             this.newChild()
         }
 
-
-
         this.cancel_button.innerText = 'Cancel';
         this.save_button.innerText = 'Save';
 
@@ -76,7 +74,6 @@ export class TodoProject extends HTMLElement {
         } else {
             throw new Error('[project] tags_appended has a value different from true/false: ' + this.tags_appended)
         }
-
 
         // item box is shared between the two states
         // this way I don't need to clone nodes and worry
@@ -234,7 +231,7 @@ export class TodoProject extends HTMLElement {
     }
     saveEditor() {
         this.title_box.textContent = this.edit_field.value;
-        this.state_manager.postSave();
+        this.state_manager.postProjectTitleChange(this);
         this.state_manager.updateNavbarContent();
         this.closeEditor();
     }
