@@ -60,7 +60,11 @@ def postProject():
 
     }
     data = request.json
-    if data.get('operation_type') == 'update_title':
+    if data.get('operation_type') == 'new_project':
+        #project_id = data.get('project_id')
+        project_id = insertProject(current_user.id, '', [])
+        response['project_id'] = project_id
+    elif data.get('operation_type') == 'update_title':
         project_id = data.get('project_id')
         new_title = data.get('new_title')
         if userOwnsProject(current_user.id, project_id) == True:

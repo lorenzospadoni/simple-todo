@@ -22,6 +22,27 @@ export async function fetchProjects(domain) {
     return result
 }
 
+export async function postProject(domain) {
+    domain = removeSlash(domain);
+    const url = domain + '/todos/projects';
+    console.log(url)
+    const request = {
+        operation_type : 'new_project',
+    }
+    const options = {
+        headers: {
+            'Content-Type' : 'application/json'
+        },
+        body: JSON.stringify(request),
+        method: 'POST',
+        credentials: 'include'
+    }
+    const response = await fetch(url, options);
+    const result = response.json()
+    console.log(result)
+    return result;
+}
+
 export async function postProjectNewTitle(domain, id, title) {
     domain = removeSlash(domain);
     const url = domain + '/todos/projects';

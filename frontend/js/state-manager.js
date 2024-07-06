@@ -1,7 +1,8 @@
 import { hasToken } from './users.js';
 import { redirectLogin } from './redirects.js';
 import { 
-    fetchProjects, 
+    fetchProjects,
+    postProject,
     postProjects,
     postProjectNewTitle,
     postItem,
@@ -48,7 +49,16 @@ export class StateManager {
         postProjects(this.backend, projects);
         console.log('[postSave] POST request sent');
     }
+    async handleNewProjectOnDb(project) {
+        const response = postProject(this.backend);
+        response.then((result) => {
+            project._id = result.project_id;
+        })
 
+    }
+    postNewProjectOnDb(project) {
+        this.handleNewProjectOnDb(project)
+    }
     async handleProjectTitleChange(project) {
         const response = postProjectNewTitle(this.backend, project._id, project.title_box.textContent);
     }

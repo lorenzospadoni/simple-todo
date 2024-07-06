@@ -326,7 +326,7 @@ def userOwnsItem(user_id: int, item_id: int, filename: str = db_file) -> bool:
 
 def insertProject(owner: int, title:str, items: list, filename: str = db_file) -> Union[int, None]:
     try:
-        '''Inserts an item to the database. Datetime is declared by the function'''
+        '''Inserts a project to the database. Datetime is declared by the function'''
         today_date = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%s')
         query = 'INSERT INTO projects(owner, title, items, date_of_creation) VALUES(?, ?, ?, ?)'
         connection = sqlite3.connect(filename)
