@@ -51,6 +51,7 @@ class Project:
             children.append(item.obj)
         representation = {
             'title' : self.title,
+            'id' : self.id,
             'children' : children
         }
         return representation
@@ -265,6 +266,24 @@ def findProjectWithItemId(item_id: int, filename: str = db_file):
     connection.close()
     return result[0]
 
+def appendItemToProjectChildren(item_id: int, project_id: int, filename: str = db_file) -> bool:
+    '''Appends an Item id to a Project items field in the db '''
+    query = '''
+        SELECT items FROM projects WHERE id = (?)'''
+    args = (project_id, )
+    connection = sqlite3.connect(filename)
+    cursor = connection.cursor()
+    cursor.execute(query, args)
+    items = json.loads(cursor.fetchone()[0])
+    items.append(item_id)
+    query = '''
+        UPDATE projects SET items = (?) WHERE id=(?)
+    '''
+    args = (json.dumps(items), project_id)
+    cursor.execute(query, args)
+    connection.commit()
+    connection.close()
+
 def removeItemIdFromProjectItems(item_id: int, project_id: int, filename: str = db_file):
     query = '''
         SELECT items FROM projects WHERE id=(?)
@@ -406,8 +425,6 @@ def fetchProjectsFromUserId(id:int, filename: str = db_file):
     #print(projects)
     return projects
 
-
-
 def deleteProject(id, filename: str = db_file):
     '''Deletes the record of a project whose id matches the given id argument'''
     query = '''DELETE FROM projects WHERE id = (?)'''
@@ -416,5 +433,18 @@ def deleteProject(id, filename: str = db_file):
     cursor.execute(query, (id, ))
     connection.commit()
     connection.close()
+
+def userOwnsProject(user_id:int, project_id:int, filename: str = db_file):
+    '''Checks if a user with a certain user_id is the owner of a project in the db'''
+    try:
+        project = fetchProjectFromProjectId(project_id, filename)
+        if project.owner == user_id:
+            return True
+        else:
+            raise AttributeError
+    except AttributeError:
+        # AttributeError is raised either when you try to access project.owner but fetchProjectFromProjectId
+        # returned None or when the user is NOT the owner of the Project
+        return False
 
 

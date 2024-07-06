@@ -1,6 +1,12 @@
 import { hasToken } from './users.js';
 import { redirectLogin } from './redirects.js';
-import { fetchProjects, postProjects, postItemContentChange, deleteItem } from './todos.js'
+import { 
+    fetchProjects, 
+    postProjects,
+    postItem,
+    postItemContentChange, 
+    deleteItem 
+} from './todos.js'
 
 export class StateManager {
     constructor(frontend, backend, _container, _arrow, _navbar, _section, startup_routine) {
@@ -52,7 +58,25 @@ export class StateManager {
     async handleDeleteItem(id) {
         const response = deleteItem(this.backend, id)
     }
-
+    postNewItemOnDb(project) {
+        this.handlePostNewItemOnDb(project)
+    }
+    async handlePostNewItemOnDb(project) {
+        const response = postItem(this.backend, project._id);
+        //console.log(result)
+        response.then((result) => {
+            console.log('handlePostNewItemOnDb(): ' + JSON.stringify(result))
+            if (result.created == true) {
+                let item = project.newChild();
+                item._id = result.item_id;   
+            } else if (result.created == false) {
+                console.log('[StateManager] COULD NOT CREATE NEW ITEM ON DB ');
+            } else {
+                throw new Error('result.created is nor equal to true nor to false');
+            }
+        })
+        
+    }
     deleteItemOnDb(item) {
         if (item._id != null) {
             this.handleDeleteItem(item._id)

@@ -4,18 +4,18 @@ from flask_login import current_user, login_user, logout_user, login_required
 from database.users import *
 from database.todos import *
 
-@login_required
 @current_app.route('/todos/items', methods=['POST'])
 def handleItemsRequests():
-    response = {
-        'updated' : None
-    }
     data = request.json
+    print(data)
     subject = data.get('operation_type')
+    user_id = current_user.id
     if subject == 'update_content':
+        response = {
+            'updated' : None
+        }
         item_id = data.get('id')
         item_id = int(item_id)
-        user_id = current_user.id
         new_content = data.get('new_content')
         print(f'ITEM_ID : {item_id}\ntype: {type(item_id)}\nnew_content: {new_content}\ntype: {type(new_content)}\n')
         if userOwnsItem(user_id, item_id) == True:
@@ -23,6 +23,20 @@ def handleItemsRequests():
             response['updated'] = True
         else:
             response['updated'] = False
+    if subject == 'new_item':
+        response = {
+            'item_id' : None,
+            'created' : True
+        }
+        project_id = int(data.get('parent_project'))
+        if userOwnsProject(user_id, project_id) == True:
+            item_id = insertItem(user_id, '')
+            appendItemToProjectChildren(item_id, project_id)
+            response['item_id'] = item_id
+            response['created'] = True
+        else:
+            response['item_id'] = None
+            response['created'] = True
     return json.dumps(response)
 
 @login_required

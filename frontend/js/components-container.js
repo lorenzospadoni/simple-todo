@@ -99,6 +99,10 @@ export class TodoContainer extends HTMLElement {
     newChild() {
         let new_child = document.createElement('todo-project');
         new_child.state_manager = this.state_manager;
+        // NOTE: this is required to create new item record in the db database
+        new_child.new_button.onclick = () => {
+            this.state_manager.postNewItemOnDb(new_child)
+        }
         new_child.setAttribute('state', 'closed');
         this.item_box.appendChild(new_child);
         this.setDoubleClick();
@@ -224,6 +228,7 @@ export class TodoContainer extends HTMLElement {
         return Array.prototype.slice.call(this.item_box.children);
     }
     set obj(container_object) {
+        console.log('[TodoContainer] this.obj = ' + JSON.stringify(container_object));
         container_object.forEach((project) => {
             let returned_element = this.newChild();
             returned_element.obj = project;

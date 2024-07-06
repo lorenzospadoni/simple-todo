@@ -120,6 +120,7 @@ export class TodoProject extends HTMLElement {
         el.editContent();
         return el;
     }
+
     attributeChangedCallback(name, oldValue, newValue) {
         if ( name === "state" ) {
             console.log('[PROJECT] attribute ' + name + ' changed from ' + oldValue + ' to ' + newValue)

@@ -38,22 +38,25 @@ export async function postProjects(domain, obj) {
     return result;
 }
 
-export async function deleteItem(domain, id) {
-    let obj = {
-        'id' : id
-    }
+export async function postItem(domain, project_id) {
     domain = removeSlash(domain);
     const url = domain + '/todos/items';
+    const request = {
+        operation_type : 'new_item',
+        parent_project : project_id
+    }
+    console.log('[postItem()]   parent_project = ' + project_id)
     const options = {
         headers: {
             'Content-Type' : 'application/json'
         },
-        body: JSON.stringify(obj),
-        method: 'DELETE',
-        credentials: 'include'
+        body: JSON.stringify(request),
+        method: 'POST',
+        credentials: 'include' 
     }
     const response = await fetch(url, options);
     const result = response.json()
+    console.log(result)
     return result;
 }
 
@@ -79,3 +82,23 @@ export async function postItemContentChange(domain, id, content) {
     console.log(result)
     return result;
 }
+
+export async function deleteItem(domain, id) {
+    let obj = {
+        'id' : id
+    }
+    domain = removeSlash(domain);
+    const url = domain + '/todos/items';
+    const options = {
+        headers: {
+            'Content-Type' : 'application/json'
+        },
+        body: JSON.stringify(obj),
+        method: 'DELETE',
+        credentials: 'include'
+    }
+    const response = await fetch(url, options);
+    const result = response.json()
+    return result;
+}
+
