@@ -251,6 +251,11 @@ def deleteItem(id: int, filename: str = db_file):
     connection.commit()
     connection.close()
     return True
+
+def deleteItems(ids: list, filename: str = db_file):
+    for id in ids:
+        deleteItem(id)
+
 def findProjectWithItemId(item_id: int, filename: str = db_file):
     '''Returns the id of the project that has a certain item id in its 'items' field'''
     query = '''
@@ -443,6 +448,19 @@ def deleteProject(id, filename: str = db_file):
     cursor.execute(query, (id, ))
     connection.commit()
     connection.close()
+
+def deleteProjectItems(project_id, filename: str = db_file):
+    query = 'SELECT items FROM projects WHERE id = (?)'
+    args = (project_id, )
+    connection = sqlite3.connect(filename)
+    cursor = connection.cursor()
+    cursor.execute(query, args)
+    items = cursor.fetchone()
+    items = json.loads(items[0])
+    deleteItems(items)
+    connection.commit()
+    connection.close()
+    return True
 
 def userOwnsProject(user_id:int, project_id:int, filename: str = db_file):
     '''Checks if a user with a certain user_id is the owner of a project in the db'''

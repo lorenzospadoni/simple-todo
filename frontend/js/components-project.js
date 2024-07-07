@@ -245,6 +245,7 @@ export class TodoProject extends HTMLElement {
             this.renderEditor();
         }
         this.menu.delete_button.onclick = () => {
+            this.state_manager.deleteProjectOnDb(this)
             this.safelyRemove();
         }
     }

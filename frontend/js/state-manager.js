@@ -5,6 +5,7 @@ import {
     postProject,
     postProjects,
     postProjectNewTitle,
+    deleteProject,
     postItem,
     postItemContentChange, 
     deleteItem 
@@ -59,6 +60,18 @@ export class StateManager {
     postNewProjectOnDb(project) {
         this.handleNewProjectOnDb(project)
     }
+
+    async handleDeleteProjectOnDb(project) {
+        const response = deleteProject(this.backend, project._id);
+        response.then((result) => {
+            console.log()
+        })
+    }
+
+    deleteProjectOnDb(project) {
+        this.handleDeleteProjectOnDb(project)
+    }
+
     async handleProjectTitleChange(project) {
         const response = postProjectNewTitle(this.backend, project._id, project.title_box.textContent);
     }

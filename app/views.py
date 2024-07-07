@@ -74,6 +74,20 @@ def postProject():
             response['updated'] = False
     return response
 
+@login_required
+@current_app.route('/todos/projects', methods=['DELETE'])
+def deleteProjectRequest():
+    response = {}
+    data = request.json
+    project_id = data.get('project_id')
+    if userOwnsProject(current_user.id, project_id) == True:
+        deleteProjectItems(project_id)
+        deleteProject(project_id)
+        response['deleted'] = True
+    else:
+        response['deleted'] = False
+    return response
+    
 @current_app.route('/todos', methods=['GET'])
 def getTodos():
     # response = [

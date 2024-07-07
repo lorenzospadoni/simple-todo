@@ -82,6 +82,25 @@ export async function postProjects(domain, obj) {
     return result;
 }
 
+export async function deleteProject(domain, id) {
+    domain = removeSlash(domain);
+    const request = {
+        project_id : id
+    }
+    const url = domain + '/todos/projects';
+    const options = {
+        headers: {
+            'Content-Type' : 'application/json'
+        },
+        body: JSON.stringify(request),
+        method: 'DELETE',
+        credentials: 'include'
+    }
+    const response = await fetch(url, options);
+    const result = response.json()
+    return result;
+}
+
 export async function postItem(domain, project_id) {
     domain = removeSlash(domain);
     const url = domain + '/todos/items';
