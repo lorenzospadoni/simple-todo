@@ -2,6 +2,8 @@ export class TodoNavbar extends HTMLElement {
     constructor() {
         super();
 
+        this.state_manager = null;
+
 
     }
     connectedCallback() {
@@ -29,10 +31,10 @@ export class TodoNavbar extends HTMLElement {
             new_li.onclick = () => {
                 try {
                     this.container.openProject( child ); 
-                    STATE_MANAGER.state = 'single'; 
+                    this.state_manager.state = 'single'; 
                 } catch (ReferenceError) {
                     this.container.openProject( child ); 
-                    STATE_MANAGER.state = 'single'; }
+                    this.state_manager.state = 'single'; }
                 }})};
     cleanContent() {
         this.children_array.forEach((child) => {

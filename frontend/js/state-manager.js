@@ -34,6 +34,8 @@ export class StateManager {
 
         this._container.state_manager = this;
         this._arrow.state_manager = this;
+        this._navbar.state_manager = this;
+
         
         this._navbar.updateContent();
         this._arrow.initOnClick();
@@ -141,7 +143,7 @@ export class StateManager {
     }
     
     updateNavbarContent() {
-        this.navbar.updateContent();
+        this._navbar.updateContent();
     }
 
     updateSectionContent() {

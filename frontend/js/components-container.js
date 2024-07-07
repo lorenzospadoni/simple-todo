@@ -103,32 +103,11 @@ export class TodoContainer extends HTMLElement {
         new_child.new_button.onclick = () => {
             this.state_manager.postNewItemOnDb(new_child)
         }
-        // new_child.save_button.onclick = () => {
-        //     new_child.closeEditor();
-        //     this.state_manager.postProjectTitleChange(new_child);
-        // }
+
         new_child.setAttribute('state', 'closed');
         this.item_box.appendChild(new_child);
         this.setDoubleClick();
-        // TODO: this should only be invoked to create projects for the user
-        // if that's not the case just append the element
-        // new_child.title_box.contentEditable = true;
-        // new_child.title_box.focus();
-        // new_child.title_box.onblur = () => { 
-        //     if (new_child.title_box.textContent == "") {
-        //         new_child.remove();
-        //         this.state_manager.saveToLocalStorage();
-        //         this.state_manager.updateNavbarContent();
-        //         this.state_manager.state = 'overview';
-        //     } else {
-        //         try {
-        //             this.state_manager.saveToLocalStorage();
-        //             this.state_manager.updateNavbarContent();
-        //         } catch (ReferenceError) {
-        //             console.log("[CONTAINER] caught ReferenceError: this is normal if it's happening on startup and web app runs smoothly")
-        //         }
-        //     }
-        // }
+        this.state_manager.updateNavbarContent()
         return new_child;
     }
     newChildUser() {
@@ -160,6 +139,7 @@ export class TodoContainer extends HTMLElement {
                 }
             }
         }
+        this.state_manager.updateNavbarContent()
         return new_child;
     }
 
@@ -238,6 +218,7 @@ export class TodoContainer extends HTMLElement {
         container_object.forEach((project) => {
             let returned_element = this.newChild();
             returned_element.obj = project;
+            this.state_manager.updateNavbarContent()
         })
     }
     get obj() {
