@@ -237,7 +237,7 @@ export class TodoProject extends HTMLElement {
     }
     safelyRemove() {
         this.remove();
-        this.state_manager.postSave();
+        //this.state_manager.postSave();
         this.state_manager.updateNavbarContent();
     }
     setMenuOnClicks() {

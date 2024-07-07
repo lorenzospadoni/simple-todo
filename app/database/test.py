@@ -1,7 +1,10 @@
 import todos
 
 #todos.appendItemToProjectChildren(11, 2)
-print(todos.fetchProjectFromProjectId(5))
+todos.dropProjectTable()
+todos.dropItemTable()
+todos.createItemTable()
+todos.createProjectTable()
 #print(todos.fetchProjects())
 # item = todos.fetchProjectFromProjectId(2)
 # print(item.obj)
