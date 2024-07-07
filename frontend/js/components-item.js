@@ -89,7 +89,28 @@ export class TodoItem extends HTMLElement {
     editContent() {
         this.label.contentEditable = true;
         this.label.focus();
-        this.label.onblur = () => { this.state_manager.postItemContentChange(this) }
+        this.label.onblur = () => {
+            console.log('TodoItem onblur')
+            if (this.isLabelEmpty() == true) {
+                console.log('isLabelEmpty() returned true')
+                this.state_manager.deleteItemOnDb(this);
+                this.remove()
+            } else if (this.isLabelEmpty() == false) {
+                console.log('isLabelEmpty() returned false')
+                this.state_manager.postItemContentChange(this) 
+            }
+            this.label.removeEventListener('keydown', this.blurOnEnter.bind(this));
+        }
+        this.label.addEventListener('keydown', this.blurOnEnter.bind(this))
+    }
+    blurOnEnter( event ) {
+        if (event.key === 'Enter') {
+            this.label.blur();
+        }
+    }
+    isLabelEmpty() {
+        const hasLettersOrNumbers = /[a-zA-Z0-9]/.test(this.label.textContent);
+        return !hasLettersOrNumbers;
     }
     addEventListeners() {
         this.oncontextmenu = () => { this.editContent() }
