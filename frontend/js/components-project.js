@@ -29,7 +29,8 @@ export class TodoProject extends HTMLElement {
 
         this.new_button.textContent = '+';
         this.new_button.onclick = () => {
-            this.newChild()
+            //this.newChild();
+            this.state_manager.postNewItemOnDb(this)
         }
 
         this.cancel_button.innerText = 'Cancel';
