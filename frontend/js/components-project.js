@@ -171,6 +171,14 @@ export class TodoProject extends HTMLElement {
             this.state_manager.initItemDraggable()
         });
     }
+    get item_order() {
+        let ids = [];
+        const items = Array.prototype.slice.call( this.item_box.children );
+        items.forEach((item) => {
+            ids.push( item._id );
+        })
+        return ids;
+    }
     set title(new_title) {
         this.title_box.innerContent = new_title;
     }
@@ -260,5 +268,7 @@ export class TodoProject extends HTMLElement {
         this.menu_button.innerText = '...';
         this.menu.setAttribute('state', 'closed')
     }
+
+
 }
 // customElements.define('todo-project', TodoProject);

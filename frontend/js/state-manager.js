@@ -5,6 +5,7 @@ import {
     postProject,
     postProjects,
     postProjectNewTitle,
+    postNewItemOrder,
     deleteProject,
     postItem,
     postItemContentChange, 
@@ -86,6 +87,18 @@ export class StateManager {
         if (project._id != null) {
             this.handleProjectTitleChange(project);
         }
+    }
+    async postOrder(project_id, item_order) {
+        const response = postNewItemOrder(project_id, item_order, this.backend);
+        return response;
+    }
+    postItemOrderOnDb(project) {
+        this.handleItemOrder(project);
+    }
+    async handleItemOrder(project) {
+        const response = postNewItemOrder(project._id, project.item_order, this.backend);
+        console.log(project.item_order);
+        return response;
     }
     async handleItemContentChange(item) {
         const response = postItemContentChange(this.backend, item._id, item.label.textContent)
@@ -187,7 +200,9 @@ export class StateManager {
         });
         
         this._item_draggable.on('sortable:sorted', ( evt ) => {
-            console.log('sortable:sorted')
+            console.log('sortable:sorted');
+            //this.postItemOrderOnDb(evt.newContainer.parentElement);
+
         })
         this._item_draggable.on('sortable:start', ( evt ) => {
             console.log('sortable:start', evt);
@@ -201,7 +216,18 @@ export class StateManager {
         this._item_draggable.on('sortable:stop', (evt) => {
             console.log('sortable:stop', evt);
             this.item_is_dragging = false;
+            console.log(evt.newContainer.parentElement);
         });
+        this._item_draggable.on('mirror:destroy', (evt) => {
+            console.log('mirror:destroy', evt);
+            const container = evt.sourceContainer.parentElement;
+            // ugliest shit I've ever seen
+            // but I'm short on ideas on how to save to the db AFTER draggable has ended
+            setTimeout(() => {this.postItemOrderOnDb(container);}, 600)
+            
+        });
+
+
     }
     destroyItemDraggable() {
         if (this._item_draggable) {

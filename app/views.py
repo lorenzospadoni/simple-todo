@@ -72,6 +72,14 @@ def postProject():
             response['updated'] = True
         else:
             response['updated'] = False
+    elif data.get('operation_type') == 'new_item_order':
+        project_id = data.get('project_id')
+        item_order = data.get('item_order')
+        #item_order = json.loads(item_order)
+        if setNewItemOrder(project_id, item_order) == True:
+            response['updated'] = True
+        else:
+            response['updated'] = False
     return response
 
 @login_required

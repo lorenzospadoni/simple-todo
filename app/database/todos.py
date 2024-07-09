@@ -289,8 +289,37 @@ def appendItemToProjectChildren(item_id: int, project_id: int, filename: str = d
     connection.commit()
     connection.close()
 
-def setNewItemOrder():
+def getItemOrder(project_id: int, filename: str = db_file) -> list:
+    '''Returns a list of all'''
+    query = 'SELECT items FROM projects WHERE id = (?)'
+    args = (project_id, )
+    connection = sqlite3.connect(filename)
+    cursor = connection.cursor()
+    cursor.execute(query, args)
+    order = cursor.fetchone()
+    connection.close()
+    return json.loads(order[0])
+
+def checkIfItemOrderIsSafe():
     pass
+
+def setNewItemOrder(project_id: int, order: list, filename: str = db_file):
+    clean_order = []
+    for item in order:
+        if type(item) == int:
+            clean_order.append(item)
+        else:
+            pass
+    print(clean_order)
+    query = 'UPDATE projects SET items = (?) WHERE id = (?)'
+    args = (json.dumps(clean_order), project_id)
+    connection = sqlite3.connect(filename)
+    cursor = connection.cursor()
+    cursor.execute(query, args)
+    connection.commit()
+    connection.close()
+    return True
+
 
 def removeItemIdFromProjectItems(item_id: int, project_id: int, filename: str = db_file):
     query = '''
