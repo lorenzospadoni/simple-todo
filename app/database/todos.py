@@ -289,6 +289,9 @@ def appendItemToProjectChildren(item_id: int, project_id: int, filename: str = d
     connection.commit()
     connection.close()
 
+def setNewItemOrder():
+    pass
+
 def removeItemIdFromProjectItems(item_id: int, project_id: int, filename: str = db_file):
     query = '''
         SELECT items FROM projects WHERE id=(?)

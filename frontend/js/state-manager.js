@@ -107,8 +107,10 @@ export class StateManager {
         response.then((result) => {
             console.log('handlePostNewItemOnDb(): ' + JSON.stringify(result))
             if (result.created == true) {
+                this.destroyItemDraggable()
                 let item = project.newChild();
-                item._id = result.item_id;   
+                item._id = result.item_id;
+                this.initItemDraggable() 
             } else if (result.created == false) {
                 console.log('[StateManager] COULD NOT CREATE NEW ITEM ON DB ');
             } else {

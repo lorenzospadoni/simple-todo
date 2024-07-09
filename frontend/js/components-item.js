@@ -28,13 +28,13 @@ export class TodoItem extends HTMLElement {
 
         this.checkbox.onmouseover = () => {
             if (this.state_manager.item_is_dragging === false) {
-                this.state_manager.destroyDraggable();
+                this.state_manager.destroyItemDraggable();
             }
         };
 
-        this.checkbox.onmouseout = () => {
+        this.checkbox.onmouseout = () => { 
             if (this.state_manager.item_is_dragging === false) {
-                this.state_manager.initDraggable();
+                this.state_manager.initItemDraggable();
             }
         };
 
@@ -48,13 +48,13 @@ export class TodoItem extends HTMLElement {
 
         this.label.onmouseover = () => {
             if (this.state_manager.item_is_dragging === false) {
-                this.state_manager.itemDestroyDraggable();
+                this.state_manager.destroyItemDraggable();
             }
         };
 
         this.label.onmouseout = () => {
             if (this.state_manager.item_is_dragging === false) {
-                this.state_manager.initDraggable();
+                this.state_manager.initItemDraggable();
             }
         };
 
