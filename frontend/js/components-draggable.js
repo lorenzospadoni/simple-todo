@@ -3,7 +3,7 @@ let is_dragging = false;
 let list_items = document.querySelectorAll("todo-item");
 // const list_container = document.querySelector('todo-container > div');
 
-function initDraggable() {
+export function initDraggable() {
     // list_container: use querySelector for a single container and querySelectorAll for multiple
     let list_container = document.querySelectorAll('todo-project > div'); 
     draggable = new Draggable.Sortable(( list_container ), {
@@ -42,7 +42,7 @@ function initDraggable() {
         is_dragging = false;
     });
 }
-function destroyDraggable() {
+export function destroyDraggable() {
     if (draggable) {
         // Remove all event listeners
         draggable.off('sortable:sorted');

@@ -1,4 +1,7 @@
 frontend/js/draggable.bundle.legacy.js
+frontend/js/node_modules/*
+frontend/js/dist/*
+
 venv/*
 app/database/simple-todo.db
 **/__pycache__/ 

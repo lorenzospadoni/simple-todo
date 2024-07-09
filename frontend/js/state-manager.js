@@ -10,6 +10,7 @@ import {
     postItemContentChange, 
     deleteItem 
 } from './todos.js'
+import {Draggable, Sortable, Plugins} from './dist/draggable.bundle.js'
 
 export class StateManager {
     constructor(frontend, backend, _container, _arrow, _navbar, _section, startup_routine) {
@@ -23,6 +24,9 @@ export class StateManager {
 
         this._arrow.container = this._container;
         this._navbar.container = this._container;
+
+        this._item_draggable = null;
+        this.item_is_dragging = null;
 
         if (startup_routine === true) {
             this.startUpRoutine();
@@ -41,6 +45,7 @@ export class StateManager {
         this._arrow.initOnClick();
         this._section.renderData( this.backend );
     }
+    
     async getSave() {
         let projects = await fetchProjects(this.backend)
         this.container.json = projects;
@@ -158,6 +163,61 @@ export class StateManager {
             redirectLogin(this.frontend);
         } else {
             console.log('STATE MANAGER HAS... ?');
+        }
+    }
+    initItemDraggable() {
+        // list_container: use querySelector for a single container and querySelectorAll for multiple
+        let list_container = document.querySelectorAll('todo-project > div'); 
+        this._item_draggable = new Sortable(( list_container ), {
+            draggable : 'todo-item',
+            mirror: {
+                constrainDimensions: true,
+            },
+            classes: {
+                'source:dragging': 'is-dragging',
+                'mirror': 'is-mirror',
+            },
+            plugins: [Plugins.SortAnimation],
+            swapAnimation: {
+                duration: 200,
+                easingFunction: 'ease-in-out',
+            },
+        });
+        
+        this._item_draggable.on('sortable:sorted', ( evt ) => {
+            console.log('sortable:sorted')
+        })
+        this._item_draggable.on('sortable:start', ( evt ) => {
+            console.log('sortable:start', evt);
+            this.item_is_dragging = true;
+        })
+        
+        this._item_draggable.on('sortable:move', (evt) => {
+            console.log('sortable:move', evt);
+        });
+        
+        this._item_draggable.on('sortable:stop', (evt) => {
+            console.log('sortable:stop', evt);
+            this.item_is_dragging = false;
+        });
+    }
+    destroyItemDraggable() {
+        if (this._item_draggable) {
+            // Remove all event listeners
+            this._item_draggable.off('sortable:sorted');
+            this._item_draggable.off('sortable:start');
+            this._item_draggable.off('sortable:move');
+            this._item_draggable.off('sortable:stop');
+    
+            // Clean up any draggable-specific attributes or styles (if necessary)
+            document.querySelectorAll('todo-item').forEach(item => {
+                item.removeAttribute('draggable');
+                item.classList.remove('is-dragging', 'is-mirror');
+            });
+    
+            // Destroy the draggable instance
+            this._item_draggable.destroy();
+            this._item_draggable = null;
         }
     }
     get state() {

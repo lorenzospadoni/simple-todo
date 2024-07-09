@@ -165,8 +165,10 @@ export class TodoProject extends HTMLElement {
         this._id = object_arg.id
         this.title_box.textContent = object_arg.title;
         object_arg.children.forEach( ( child_obj ) => {
+            this.state_manager.destroyItemDraggable()
             let child_html = this.newChild();
             child_html.obj =  child_obj ;
+            this.state_manager.initItemDraggable()
         });
     }
     set title(new_title) {

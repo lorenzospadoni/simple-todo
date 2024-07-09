@@ -27,14 +27,14 @@ export class TodoItem extends HTMLElement {
         this.classList.add("list_item");
 
         this.checkbox.onmouseover = () => {
-            if (is_dragging === false) {
-                destroyDraggable();
+            if (this.state_manager.item_is_dragging === false) {
+                this.state_manager.destroyDraggable();
             }
         };
 
         this.checkbox.onmouseout = () => {
-            if (is_dragging === false) {
-                initDraggable();
+            if (this.state_manager.item_is_dragging === false) {
+                this.state_manager.initDraggable();
             }
         };
 
@@ -47,14 +47,14 @@ export class TodoItem extends HTMLElement {
         };
 
         this.label.onmouseover = () => {
-            if (is_dragging === false) {
-                destroyDraggable();
+            if (this.state_manager.item_is_dragging === false) {
+                this.state_manager.itemDestroyDraggable();
             }
         };
 
         this.label.onmouseout = () => {
-            if (is_dragging === false) {
-                initDraggable();
+            if (this.state_manager.item_is_dragging === false) {
+                this.state_manager.initDraggable();
             }
         };
 

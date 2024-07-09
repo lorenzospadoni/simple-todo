@@ -33,8 +33,9 @@ const section = document.querySelector('user-section');
 main_section.appendChild( container );
 
 const STATE_MANAGER = new StateManager(FRONTEND, BACKEND, container, arrow, navbar, section, false);
-STATE_MANAGER.startUpRoutine()
+STATE_MANAGER.startUpRoutine();
+STATE_MANAGER.initItemDraggable();
 
-console.log(fetchProjects(BACKEND)) 
+//console.log(fetchProjects(BACKEND)) 
 // needed to stop the arrow from appearing on start up
 
