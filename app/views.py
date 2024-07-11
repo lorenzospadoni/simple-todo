@@ -3,6 +3,9 @@ from flask_login import current_user, login_user, logout_user, login_required
 
 from database.users import *
 from database.todos import *
+import database.items as dbitems
+import database.projects as dbprojects
+import database.containers as dbcontainers
 
 @current_app.route('/todos/items', methods=['POST'])
 def handleItemsRequests():
@@ -18,8 +21,8 @@ def handleItemsRequests():
         item_id = int(item_id)
         new_content = data.get('new_content')
         print(f'ITEM_ID : {item_id}\ntype: {type(item_id)}\nnew_content: {new_content}\ntype: {type(new_content)}\n')
-        if userOwnsItem(user_id, item_id) == True:
-            updateItemContent(item_id, new_content)
+        if dbitems.userOwnsItem(user_id, item_id) == True:
+            dbitems.updateItemContent(item_id, new_content)
             response['updated'] = True
         else:
             response['updated'] = False
@@ -29,9 +32,9 @@ def handleItemsRequests():
             'created' : True
         }
         project_id = int(data.get('parent_project'))
-        if userOwnsProject(user_id, project_id) == True:
-            item_id = insertItem(user_id, '')
-            appendItemToProjectChildren(item_id, project_id)
+        if dbprojects.userOwnsProject(user_id, project_id) == True:
+            item_id = dbitems.insertItem(user_id, '')
+            dbprojects.appendItemToProjectChildren(item_id, project_id)
             response['item_id'] = item_id
             response['created'] = True
         else:
@@ -46,9 +49,9 @@ def handleItemsDelete():
     response = {
         'deleted' : None
     }
-    if userOwnsItem(current_user.id, data.get('id')) == True:
+    if dbitems.userOwnsItem(current_user.id, data.get('id')) == True:
         response['deleted'] = True
-        removeItemIdFromProjects(data.get('id')) # this doesn't look safe at all lmao
+        dbitems.removeItemIdFromProjects(data.get('id')) # this doesn't look safe at all lmao
     else:
         response['deleted'] = False
     return json.dumps(response)
@@ -62,13 +65,13 @@ def postProject():
     data = request.json
     if data.get('operation_type') == 'new_project':
         #project_id = data.get('project_id')
-        project_id = insertProject(current_user.id, '', [])
+        project_id = dbprojects.insertProject(current_user.id, '', [])
         response['project_id'] = project_id
     elif data.get('operation_type') == 'update_title':
         project_id = data.get('project_id')
         new_title = data.get('new_title')
-        if userOwnsProject(current_user.id, project_id) == True:
-            updateProjectTitle(project_id, new_title)
+        if dbprojects.userOwnsProject(current_user.id, project_id) == True:
+            dbprojects.updateProjectTitle(project_id, new_title)
             response['updated'] = True
         else:
             response['updated'] = False
@@ -76,7 +79,7 @@ def postProject():
         project_id = data.get('project_id')
         item_order = data.get('item_order')
         #item_order = json.loads(item_order)
-        if setNewItemOrder(project_id, item_order) == True:
+        if dbitems.setNewItemOrder(project_id, item_order) == True:
             response['updated'] = True
         else:
             response['updated'] = False
@@ -88,9 +91,9 @@ def deleteProjectRequest():
     response = {}
     data = request.json
     project_id = data.get('project_id')
-    if userOwnsProject(current_user.id, project_id) == True:
-        deleteProjectItems(project_id)
-        deleteProject(project_id)
+    if dbprojects.userOwnsProject(current_user.id, project_id) == True:
+        dbprojects.deleteProjectItems(project_id)
+        dbprojects.deleteProject(project_id)
         response['deleted'] = True
     else:
         response['deleted'] = False
@@ -110,8 +113,8 @@ def getTodos():
     # ]
     if current_user.is_authenticated == True:
         print(type(current_user.id))
-        projects = fetchProjectsFromUserId(current_user.id)
-        projects = convertProjectCollectionToList(projects)
+        projects = dbprojects.fetchProjectsFromUserId(current_user.id)
+        projects = dbprojects.convertProjectCollectionToList(projects)
     else:
         projects = []
     response = json.dumps(projects)
