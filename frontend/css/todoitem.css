@@ -28,6 +28,7 @@ todo-item.is-dragging {
     position: relative;
     display: flex;
     align-items: center;
+    min-width: 80%;
 }
 
 .checkbox {

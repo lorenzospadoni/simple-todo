@@ -40,7 +40,9 @@ export class TodoItem extends HTMLElement {
 
         this.checkbox.onclick = (event) => {
             event.stopPropagation();
-            this.handleCheckboxChange()
+            this.checkbox.classList.remove('checkbox-not-checked');
+            this.checkbox.classList.add('checkbox-checked');
+            this.classList.add('item-fade-out')
 
         };
 
@@ -105,22 +107,12 @@ export class TodoItem extends HTMLElement {
     }
     addEventListeners() {
         this.oncontextmenu = () => { this.editContent() }
-        // this.addEventListener('animationend', () => {
-        //     this.remove();
-        //     this.state_manager.deleteItemOnDb(this);
-        // });
-    }
-    handleCheckboxChange() {
-        this.checkbox.classList.remove('checkbox-not-checked');
-        this.checkbox.classList.add('checkbox-checked');
-        this.classList.add('item-fade-out');
         this.addEventListener('animationend', () => {
             this.remove();
             this.state_manager.deleteItemOnDb(this);
         });
-
     }
-    handleCheckboxChangeOld(isChecked) {
+    handleCheckboxChange(isChecked) {
         if (isChecked === true) {
             this.classList.add('item-fade-out');
             this.addEventListener('animationend', () => {
@@ -129,7 +121,6 @@ export class TodoItem extends HTMLElement {
             });
         }
     }
-
     get obj() {
         return {
             'id' : this._id,

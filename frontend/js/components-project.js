@@ -107,7 +107,7 @@ export class TodoProject extends HTMLElement {
 
         this.menu.setAttribute('state', 'closed')
         this.setMenuOnClicks();
-
+        this.setDraggableBlurs()
     }
     disconnectedCallback() {
         console.log('TodoProject remove from document');
