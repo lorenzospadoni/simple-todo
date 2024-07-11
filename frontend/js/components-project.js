@@ -20,8 +20,8 @@ export class TodoProject extends HTMLElement {
 
         this.menu_button = document.createElement('button');
         this.menu_section = document.createElement('section');
-        this.edit_button = document.createElement('button');
-        this.delete_button = document.createElement('button');
+        this.edit_button = null;
+        this.delete_button = null;
 
         this.item_box = document.createElement('div');
         this.new_button = document.createElement('button');
@@ -59,6 +59,7 @@ export class TodoProject extends HTMLElement {
                 throw new Error('[PROJECT MENU] menu state is neither closed nor open');
             }
         }
+
     }
     connectedCallback() {
         console.log('TodoProject added to document');
@@ -106,6 +107,8 @@ export class TodoProject extends HTMLElement {
         
 
         this.menu.setAttribute('state', 'closed')
+        //this.edit_button = this.menu.edit_button;
+        //this.delete_button = this.menu.delete_button;
         this.setMenuOnClicks();
         this.setDraggableBlurs()
     }
@@ -121,34 +124,46 @@ export class TodoProject extends HTMLElement {
         return el;
     }
     setDraggableBlurs() {
-        this.title_box.onmouseover = () => {
-            if (this.state_manager.project_is_dragging == false) {
-                this.state_manager.destroyProjectDraggable();      
+        const collection = [
+            this.title_box,
+            this.edit_field,
+            this.cancel_button,
+            this.save_button,
+            this.menu_button,
+            this.menu.edit_button, 
+            this.menu.delete_button
+        ];
+        function handleOvers() {
+            if (globalThis.STATE_MANAGER.project_is_dragging == false) {
+                globalThis.STATE_MANAGER.destroyProjectDraggable();      
             }
-
         }
-        this.title_box.onmouseout = () => {
-            if (this.state_manager.project_is_dragging == false) {
-            this.state_manager.initProjectDraggable();
+        function handleOuts() {
+            if (globalThis.STATE_MANAGER.project_is_dragging == false) {
+                globalThis.STATE_MANAGER.initProjectDraggable();      
             }
         }
-
-        this.menu_button.onmouseover = () => {
-            if (this.state_manager.project_is_dragging == false) {
-            this.state_manager.destroyProjectDraggable();
-        }}
-
-        this.menu_button.onmouseout = () => {
-            if (this.state_manager.project_is_dragging == false) {
-                this.state_manager.initProjectDraggable();
-            }}
+        collection.forEach((el) => {
+            el.onmouseover = handleOvers;
+            el.onmouseout = handleOuts;
+        })  
 
     }
     unsetDraggableBlurs() {
-        this.title_box.onmouseover = () => { }
-        this.title_box.onmouseout = () => { }
-        this.menu_button.onmouseover = () => {}
-        this.menu_button.onmouseout = () => {}
+        const collection = [
+            this.title_box,
+            this.edit_field,
+            this.cancel_button,
+            this.save_button,
+            this.menu_button,
+            this.menu.edit_button, 
+            this.menu.delete_button
+        ];
+        collection.forEach((el) => {
+            el.onmouseover = () => {}
+            el.onmouseout = () => {}    
+        })
+
     }
     attributeChangedCallback(name, oldValue, newValue) {
         if ( name === "state" ) {
