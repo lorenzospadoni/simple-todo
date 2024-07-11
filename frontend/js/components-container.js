@@ -97,6 +97,7 @@ export class TodoContainer extends HTMLElement {
         // elem.setStyleOpen();
     }
     newChild() {
+        this.state_manager.destroyProjectDraggable()
         let new_child = document.createElement('todo-project');
         new_child.state_manager = this.state_manager;
         // NOTE: this is required to create new item record in the db database
@@ -108,9 +109,11 @@ export class TodoContainer extends HTMLElement {
         this.item_box.appendChild(new_child);
         this.setDoubleClick();
         this.state_manager.updateNavbarContent()
+        this.state_manager.initProjectDraggable()
         return new_child;
     }
     newChildUser() {
+        this.state_manager.destroyProjectDraggable()
         let new_child = document.createElement('todo-project');
         new_child.state_manager = this.state_manager;
         this.state_manager.postNewProjectOnDb(new_child);
@@ -140,6 +143,8 @@ export class TodoContainer extends HTMLElement {
             }
         }
         this.state_manager.updateNavbarContent()
+        this.state_manager.initProjectDraggable()
+
         return new_child;
     }
 

@@ -26,6 +26,10 @@ export class StateManager {
         this._arrow.container = this._container;
         this._navbar.container = this._container;
 
+        this._project_draggable = null;
+        this.project_draggable_active = false;
+        this.project_is_dragging = null;
+
         this._item_draggable = null;
         this.item_is_dragging = null;
 
@@ -180,6 +184,104 @@ export class StateManager {
             console.log('STATE MANAGER HAS... ?');
         }
     }
+
+    initProjectDraggable() {
+        if (this.project_draggable_active === false) {
+            // list_container: use querySelector for a single container and querySelectorAll for multiple
+            let list_container = document.querySelector('todo-container > div'); 
+            this._project_draggable = new Sortable(( list_container ), {
+                draggable : 'todo-project',
+                mirror: {
+                    constrainDimensions: true,
+                },
+                classes: {
+                    'source:dragging': 'is-dragging',
+                    'mirror': 'is-mirror',
+                },
+                plugins: [Plugins.SortAnimation],
+                swapAnimation: {
+                    duration: 200,
+                    easingFunction: 'ease-in-out',
+                },
+            });
+
+            this._project_draggable.on('sortable:sorted', ( evt ) => {
+                console.log('sortable:sorted');
+                //this.postItemOrderOnDb(evt.newContainer.parentElement);
+
+            })
+            this._project_draggable.on('sortable:start', ( evt ) => {
+                console.log('sortable:start', evt);
+                this.project_is_dragging = true;
+                // this ensures that the copy that stays still when the drag event occurs
+                // aka 'source' has as title the same textContent as the original source
+                // aka the real element that is hidden by Draggable during drag events
+                //this is basically sorcery don't touch it for your life
+                const source_element = evt.data.dragEvent.data.source;
+                const og_element = evt.data.dragEvent.data.originalSource;
+                source_element.title_box.textContent = og_element.title_box.textContent;
+                // this serves no purpose other than to avoid polluting the dev console with errors:
+                source_element.state_manager = og_element.state_manager;
+            })
+
+            this._project_draggable.on('sortable:move', (evt) => {
+                console.log('sortable:move', evt);
+            });
+
+            this._project_draggable.on('sortable:stop', (evt) => {
+                console.log('sortable:stop', evt);
+                this.project_is_dragging = false;
+                //console.log(evt.newContainer.parentElement);
+            });
+            this._project_draggable.on('mirror:create'), (evt) => {
+                console.log('AAAAAAAmirror:create', evt);
+            }
+            this._project_draggable.on('mirror:created', function (evt) {
+                //let mirror = evt.data.mirror;
+                console.log('mirror:created', evt);
+                console.log(evt.originalSource.title);
+                // this ensures that the mirror element, that is the element that
+                // follows the pointer around when dragging has the title
+                // of the original element that is hidden during Draggable events
+                // again, it's badly-documented magic don't touch it.
+                const mirror_element = evt.data.mirror;
+                const og_element = evt.originalSource;
+                mirror_element.title_box.textContent = og_element.title_box.textContent;
+                mirror_element.state_manager = og_element.state_manager;
+                console.log('mirror:created og state_manager', og_element.state_manager);
+                console.log('mirror:created mirror state_manager', mirror_element.state_manager);
+                console.log('mirror:created this object', this)
+                //evt.data.mirror.title_box.textContent = evt.originalSource.title;
+            });
+            this._project_draggable.on('mirror:destroy', (evt) => {
+                console.log('mirror:destroy', evt);
+                
+            });
+            this.project_draggable_active = true;
+        }
+        
+    }
+    destroyProjectDraggable() {
+        if (this._project_draggable) {
+            // Remove all event listeners
+            this._project_draggable.off('sortable:sorted');
+            this._project_draggable.off('sortable:start');
+            this._project_draggable.off('sortable:move');
+            this._project_draggable.off('sortable:stop');
+    
+            // Clean up any draggable-specific attributes or styles (if necessary)
+            document.querySelectorAll('todo-project').forEach(project => {
+                project.removeAttribute('draggable');
+                project.classList.remove('is-dragging', 'is-mirror');
+            });
+    
+            // Destroy the draggable instance
+            this._project_draggable.destroy();
+            this._project_draggable = null;
+            this.project_draggable_active = false;
+        }
+    }
+
     initItemDraggable() {
         // list_container: use querySelector for a single container and querySelectorAll for multiple
         let list_container = document.querySelectorAll('todo-project > div'); 
@@ -207,6 +309,11 @@ export class StateManager {
         this._item_draggable.on('sortable:start', ( evt ) => {
             console.log('sortable:start', evt);
             this.item_is_dragging = true;
+            const source_item = evt.data.dragEvent.data.source;
+            const og_item = evt.data.dragEvent.data.originalSource;
+            // this serves no purpose other than to avoid polluting the dev console with errors:
+            source_item.state_manager = og_item.state_manager;
+            
         })
         
         this._item_draggable.on('sortable:move', (evt) => {

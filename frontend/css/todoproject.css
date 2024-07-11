@@ -105,6 +105,8 @@ todo-project{
     min-width: 400px;
     width: 90%;
     position:relative; /* required for positioning menu_button */
+    background-color: #eee2b1;
+
 }
 .project-closed:hover{
     border: 1px solid black;

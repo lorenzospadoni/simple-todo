@@ -1,5 +1,6 @@
 // import { ProjectMenu } from './webcomponents.js'
 //customElements.define('project-menu', ProjectMenu);
+// import STATE_MANAGER from './extensions.js'
 
 export class TodoProject extends HTMLElement {
     static observedAttributes = ["title", "state"];
@@ -103,13 +104,36 @@ export class TodoProject extends HTMLElement {
 
         this.appendChild(this.menu_button);
 
+        this.title_box.onmouseover = () => {
+            if (this.state_manager.project_is_dragging == false) {
+                this.state_manager.destroyProjectDraggable();      
+            }
+
+        }
+        this.title_box.onmouseout = () => {
+            if (this.state_manager.project_is_dragging == false) {
+            this.state_manager.initProjectDraggable();
+            }
+        }
+
+        this.menu_button.onmouseover = () => {
+            if (this.state_manager.project_is_dragging == false) {
+            this.state_manager.destroyProjectDraggable();
+        }}
+
+        this.menu_button.onmouseout = () => {
+            if (this.state_manager.project_is_dragging == false) {
+                this.state_manager.initProjectDraggable();
+            }}
+
+
         this.menu.setAttribute('state', 'closed')
         this.setMenuOnClicks();
 
     }
     disconnectedCallback() {
         console.log('TodoProject remove from document');
-        destroyDraggable();
+        //destroyDraggable();
     }
     newChild() {
         let el = document.createElement( 'todo-item' ); 
@@ -123,20 +147,21 @@ export class TodoProject extends HTMLElement {
         if ( name === "state" ) {
             console.log('[PROJECT] attribute ' + name + ' changed from ' + oldValue + ' to ' + newValue)
             if ( newValue === 'open' ) {
-                // destroyDraggable();
-                // initDraggable();
-                //this.title_box.contentEditable = true;
+                this.state_manager.destroyProjectDraggable()
                 this.title_box.onclick = () => { this.renderEditor() }
                 this.setStyleOpen();
                 console.log('open')
             } else if (newValue === 'closed') {
-                // destroyDraggable();
+                this.state_manager.initProjectDraggable()
+                // this.state_manager.destroyProjectDraggable()
                 // this.title_box.contentEditable = false;
                 this.title_box.onclick = () => {}; // disables title editor on state change
                 this.setStyleClosed();
                 this.closeEditor();
+                //this.state_manager.initProjectDraggable()
                 console.log('closed');
             } else if (newValue === 'hidden') {
+                //this.state_manager.destroyProjectDraggable()
                 this.title_box.onclick = () => {}; // disables title editor on state change
                 // destroyDraggable();
                 this.setStyleHidden();
@@ -178,6 +203,10 @@ export class TodoProject extends HTMLElement {
             ids.push( item._id );
         })
         return ids;
+    }
+
+    get title() {
+        return this.title_box.textContent;
     }
     set title(new_title) {
         this.title_box.innerContent = new_title;
