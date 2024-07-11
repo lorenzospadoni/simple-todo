@@ -186,6 +186,7 @@ export class StateManager {
     }
 
     initProjectDraggable() {
+        console.log('[ACTIVATING PROJECT DRAGGABLE]')
         if (this.project_draggable_active === false) {
             // list_container: use querySelector for a single container and querySelectorAll for multiple
             let list_container = document.querySelector('todo-container > div'); 
@@ -262,7 +263,8 @@ export class StateManager {
         
     }
     destroyProjectDraggable() {
-        if (this._project_draggable) {
+        console.log('[DEACTIVATING PROJECT DRAGGABLE]')
+        if (this._project_draggable !== null) {
             // Remove all event listeners
             this._project_draggable.off('sortable:sorted');
             this._project_draggable.off('sortable:start');

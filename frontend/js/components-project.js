@@ -1,6 +1,5 @@
 // import { ProjectMenu } from './webcomponents.js'
 //customElements.define('project-menu', ProjectMenu);
-// import STATE_MANAGER from './extensions.js'
 
 export class TodoProject extends HTMLElement {
     static observedAttributes = ["title", "state"];
@@ -104,6 +103,24 @@ export class TodoProject extends HTMLElement {
 
         this.appendChild(this.menu_button);
 
+        
+
+        this.menu.setAttribute('state', 'closed')
+        this.setMenuOnClicks();
+
+    }
+    disconnectedCallback() {
+        console.log('TodoProject remove from document');
+        //destroyDraggable();
+    }
+    newChild() {
+        let el = document.createElement( 'todo-item' ); 
+        el.state_manager = this.state_manager
+        this.item_box.appendChild( el ); 
+        el.editContent();
+        return el;
+    }
+    setDraggableBlurs() {
         this.title_box.onmouseover = () => {
             if (this.state_manager.project_is_dragging == false) {
                 this.state_manager.destroyProjectDraggable();      
@@ -126,33 +143,25 @@ export class TodoProject extends HTMLElement {
                 this.state_manager.initProjectDraggable();
             }}
 
-
-        this.menu.setAttribute('state', 'closed')
-        this.setMenuOnClicks();
-
     }
-    disconnectedCallback() {
-        console.log('TodoProject remove from document');
-        //destroyDraggable();
+    unsetDraggableBlurs() {
+        this.title_box.onmouseover = () => { }
+        this.title_box.onmouseout = () => { }
+        this.menu_button.onmouseover = () => {}
+        this.menu_button.onmouseout = () => {}
     }
-    newChild() {
-        let el = document.createElement( 'todo-item' ); 
-        el.state_manager = this.state_manager
-        this.item_box.appendChild( el ); 
-        el.editContent();
-        return el;
-    }
-
     attributeChangedCallback(name, oldValue, newValue) {
         if ( name === "state" ) {
             console.log('[PROJECT] attribute ' + name + ' changed from ' + oldValue + ' to ' + newValue)
             if ( newValue === 'open' ) {
-                this.state_manager.destroyProjectDraggable()
+                globalThis.STATE_MANAGER.destroyProjectDraggable()
+                this.unsetDraggableBlurs();
                 this.title_box.onclick = () => { this.renderEditor() }
                 this.setStyleOpen();
                 console.log('open')
             } else if (newValue === 'closed') {
-                this.state_manager.initProjectDraggable()
+                globalThis.STATE_MANAGER.initProjectDraggable()
+                this.setDraggableBlurs();
                 // this.state_manager.destroyProjectDraggable()
                 // this.title_box.contentEditable = false;
                 this.title_box.onclick = () => {}; // disables title editor on state change

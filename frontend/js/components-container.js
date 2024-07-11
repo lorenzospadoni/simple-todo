@@ -55,6 +55,7 @@ export class TodoContainer extends HTMLElement {
                 this.setChildrenStateOverview();
 
             } else if (newValue === 'single') {
+                // setTimeout(() => {this.state_manager.destroyProjectDraggable()}, 500)
                 this.classList.add('container-single');
                 this.classList.remove('container-overview');
             } 
