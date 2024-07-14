@@ -66,6 +66,28 @@ export async function postProjectNewTitle(domain, id, title) {
     return result;
 }
 
+export async function postProjectNewOrder(project_order, domain) {
+    domain = removeSlash(domain);
+    const url = domain + '/todos/projects';
+    console.log(url)
+    const request = {
+        operation_type : 'new_project_order',
+        project_order: project_order
+    }
+    const options = {
+        headers: {
+            'Content-Type' : 'application/json'
+        },
+        body: JSON.stringify(request),
+        method: 'POST',
+        credentials: 'include'
+    }
+    const response = await fetch(url, options);
+    const result = response.json()
+    console.log(result)
+    return result;
+}
+
 export async function postNewItemOrder(project_id, item_order, domain) {
     domain = removeSlash(domain);
     const url = domain + '/todos/projects';

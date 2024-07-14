@@ -5,6 +5,7 @@ import {
     postProject,
     postProjects,
     postProjectNewTitle,
+    postProjectNewOrder,
     postNewItemOrder,
     deleteProject,
     postItem,
@@ -136,6 +137,13 @@ export class StateManager {
         })
         
     }
+    async handleNewProjectOrder(arr) {
+        const response = postProjectNewOrder(arr, this.backend)
+        return response;
+    }
+    newProjectOrder(container) {
+        return this.handleNewProjectOrder(container.item_array_ids)
+    }
     deleteItemOnDb(item) {
         if (item._id != null) {
             this.handleDeleteItem(item._id)
@@ -256,6 +264,10 @@ export class StateManager {
             });
             this._project_draggable.on('mirror:destroy', (evt) => {
                 console.log('mirror:destroy', evt);
+                const container = evt.sourceContainer.parentElement;
+                // ugliest shit I've ever seen
+                // but I'm short on ideas on how to save to the db AFTER draggable has ended
+                setTimeout(() => {this.newProjectOrder(container);}, 600)
                 
             });
             this.project_draggable_active = true;

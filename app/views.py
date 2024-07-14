@@ -1,5 +1,9 @@
+import os, sys
+
 from flask import request, json, current_app
 from flask_login import current_user, login_user, logout_user, login_required
+
+sys.path.append(os.path.join(os.path.dirname(__file__), 'database'))
 
 from database.users import *
 from database.todos import *
@@ -34,7 +38,7 @@ def handleItemsRequests():
         project_id = int(data.get('parent_project'))
         if dbprojects.userOwnsProject(user_id, project_id) == True:
             item_id = dbitems.insertItem(user_id, '')
-            dbprojects.appendItemToProjectChildren(item_id, project_id)
+            dbitems.appendItemToProjectChildren(item_id, project_id)
             response['item_id'] = item_id
             response['created'] = True
         else:
@@ -65,7 +69,8 @@ def postProject():
     data = request.json
     if data.get('operation_type') == 'new_project':
         #project_id = data.get('project_id')
-        project_id = dbprojects.insertProject(current_user.id, '', [])
+        position = getBiggestPosition(current_user.id) + 1
+        project_id = dbprojects.insertProject(current_user.id, '', [], position)
         response['project_id'] = project_id
     elif data.get('operation_type') == 'update_title':
         project_id = data.get('project_id')
@@ -75,6 +80,18 @@ def postProject():
             response['updated'] = True
         else:
             response['updated'] = False
+    elif data.get('operation_type') == 'new_project_order':
+        project_order = data.get('project_order')
+        counter = 0
+        if userOwnsProjects(current_user.id, project_order) == True:
+            for project_id in project_order:
+                counter = counter + 1
+                dbprojects.updateProjectPosition(project_id, counter)
+            response['updated'] = True
+        if userOwnsProjects(current_user.id, project_order) == False:
+            response['updated'] = False
+        # else:
+        #     response['updatsed'] = False
     elif data.get('operation_type') == 'new_item_order':
         project_id = data.get('project_id')
         item_order = data.get('item_order')

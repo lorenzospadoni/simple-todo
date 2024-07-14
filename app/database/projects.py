@@ -1,18 +1,19 @@
 import sqlite3, datetime, json, os
 from typing import Union
 
-import database.items as dbitems
+import items as dbitems
 
 working_directory = os.path.dirname(__file__)
 db_file = working_directory + '/' + 'simple-todo.db'
 
 class Project:
-    def __init__(self, id: int, owner: int, title: str, items: list, date_of_creation: str) -> object:
+    def __init__(self, id: int, owner: int, title: str, items: list, date_of_creation: str, position) -> object:
         self.id = id
         self.owner = owner
         self.title = title
         self.items = items
         self.date_of_creation = date_of_creation
+        self.position = position
     @property
     def obj(self) -> dict:
         children = []
@@ -23,7 +24,8 @@ class Project:
         representation = {
             'title' : self.title,
             'id' : self.id,
-            'children' : children
+            'children' : children,
+            'position' : self.position
         }
         return representation
     @property
@@ -58,7 +60,8 @@ def createProjectTable(filename: str = db_file):
     owner INTEGER,
     title TEXT,
     items JSON,
-    date_of_creation TEXT
+    date_of_creation TEXT,
+    position INTEGER
     );
     '''
     connection = sqlite3.connect(filename)
@@ -76,14 +79,14 @@ def dropProjectTable(filename: str = db_file):
     connection.commit()
     connection.close()
 
-def insertProject(owner: int, title:str, items: list, filename: str = db_file) -> Union[int, None]:
+def insertProject(owner: int, title:str, items: list, position: int,filename: str = db_file) -> Union[int, None]:
     try:
         '''Inserts a project to the database. Datetime is declared by the function'''
         today_date = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%s')
-        query = 'INSERT INTO projects(owner, title, items, date_of_creation) VALUES(?, ?, ?, ?)'
+        query = 'INSERT INTO projects(owner, title, items, date_of_creation, position) VALUES(?, ?, ?, ?, ?)'
         connection = sqlite3.connect(filename)
         cursor = connection.cursor()
-        cursor.execute(query, (owner, title, json.dumps(items), today_date))
+        cursor.execute(query, (owner, title, json.dumps(items), today_date, position))
         last_row = cursor.lastrowid
         connection.commit()
         connection.close()
@@ -118,7 +121,8 @@ def fromRecordToProject(record: tuple) -> Project:
     title = record[2]
     items = dbitems.fetchItemCollectionFromIds(json.loads(record[3]))
     date_of_creation = record[4]
-    project = Project(id, owner, title, items, date_of_creation)
+    position = record[5]
+    project = Project(id, owner, title, items, date_of_creation, position)
     return project
 
 def fromRecordsToProjectCollection(records: tuple) -> list:
@@ -163,20 +167,18 @@ def fetchProjectItems(project_id: int, owner_id:int, filename: str = db_file):
     return items
 
 def fetchProjects(filename: str = db_file):
-    query = '''SELECT * FROM projects'''
+    query = '''SELECT * FROM projects ORDER BY position ASC'''
     connection = sqlite3.connect(filename)
     cursor = connection.cursor()
     cursor.execute(query)
     projects_raw = cursor.fetchall()
     connection.close()
-    projects = []
-    for project_raw in projects_raw:
-        project = Project(project_raw[0], project_raw[1],project_raw[2],project_raw[3],project_raw[4])
-        projects.append(project)
+    # projects = []
+    projects = fromRecordsToProjectCollection(projects_raw)
     return projects
 
 def fetchProjectsFromUserId(id:int, filename: str = db_file):
-    query = '''SELECT * FROM projects WHERE owner = (?)'''
+    query = '''SELECT * FROM projects WHERE owner = (?) ORDER BY position ASC'''
     args = (id, )
     connection = sqlite3.connect(filename)
     cursor = connection.cursor()
@@ -221,7 +223,33 @@ def userOwnsProject(user_id:int, project_id:int, filename: str = db_file):
         # AttributeError is raised either when you try to access project.owner but fetchProjectFromProjectId
         # returned None or when the user is NOT the owner of the Project
         return False
-    
 
+def userOwnsProjects(user_id:int, project_ids: list, filename: str = db_file):
+    '''Checks if a user with a certain user_id is the owner of all the given projects'''
+    for project_id in project_ids:
+        success = userOwnsProject(user_id, project_id)
+        if success == True:
+            pass
+        elif success == False:
+            return False
+    return True
+
+def getBiggestPosition(user_id: int, filename: str = db_file):
+    query = 'SELECT MAX(position) FROM projects WHERE owner = (?)'
+    args = (user_id, )
+    connection = sqlite3.connect(filename)
+    cursor = connection.cursor()
+    cursor.execute(query, args)
+    position = cursor.fetchone()
+    return position[0]
+
+def updateProjectPosition(project_id: int, position: int, filename: str = db_file):
+    query = 'UPDATE projects SET position = (?) WHERE id = (?)'
+    args = (position, project_id)
+    connection = sqlite3.connect(filename)
+    cursor = connection.cursor()
+    cursor.execute(query, args)
+    connection.commit()
+    connection.close()
 
 

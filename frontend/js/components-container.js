@@ -219,6 +219,14 @@ export class TodoContainer extends HTMLElement {
     get item_array() {
         return Array.prototype.slice.call(this.item_box.children);
     }
+    get item_array_ids() {
+        let new_arr = [];
+        this.item_array.forEach((project) => {
+            new_arr.push(project._id)
+        })
+        return new_arr;
+    }
+
     set obj(container_object) {
         console.log('[TodoContainer] this.obj = ' + JSON.stringify(container_object));
         container_object.forEach((project) => {

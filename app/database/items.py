@@ -222,7 +222,7 @@ def removeItemIdFromProjectItems(item_id: int, project_id: int, filename: str = 
     items = json.loads(items)
     items.remove(item_id)
     items = json.dumps(items)
-    query = '''Bonjour
+    query = '''
         UPDATE projects SET items = (?) WHERE id = (?)
     '''
     args = (items, project_id)
