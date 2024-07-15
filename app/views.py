@@ -137,6 +137,29 @@ def getTodos():
     response = json.dumps(projects)
     return json.dumps(response)
 
+@current_app.route('/users/<username>', methods=['GET'])
+def getUser(username):
+    response = {}
+    response['username'] = username
+    response['available'] = usernameAvailable(username)
+    response = json.dumps(response)
+    return response
+
+@current_app.route('/users/register', methods=['POST'])
+def registerPost():
+    data = request.json
+    response = {
+        'username' : data.get('username'),
+        'success' : None
+    }
+    username_available = usernameAvailable(data.get('username'))
+    if username_available == True:
+        insertUser(data.get('username'), data.get('password'), True)
+        response['success'] = True
+    elif username_available == False:
+        response['success'] = False
+    return json.dumps(response)
+
 @current_app.route('/users/login', methods=['POST'])
 def loginPost():
     response = {

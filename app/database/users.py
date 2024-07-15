@@ -129,6 +129,13 @@ def getUserFromUsername(username: str, filename = db_file) -> Union[User, None]:
     else:
         return None
 
+def usernameAvailable(username: str):
+    user = getUserFromUsername(username, filename = db_file)
+    if user == None:
+        return True
+    else:
+        return False
+    
 def checkIfUserPasswordIsCorrect(username: str, password: str, filename = db_file) -> Union[bool, None]:
     '''Checks if there is an user record with the given username and tests its password against the
     given one'''

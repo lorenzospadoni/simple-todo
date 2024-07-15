@@ -71,3 +71,23 @@ export async function logoutUser( domain = BACKEND ) {
     const result = await response.json()
     return result;
 }
+
+export async function registerUser(username, password, domain = BACKEND) {
+    domain = removeSlash(domain);
+    const data = {
+        'username' : username,
+        'password' : password
+    }
+    const url = domain + '/users/register';
+    const options = {
+        method : 'POST',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    }
+    const response = await fetch(url, options)
+    const result = await response.json();
+    return result;
+}
