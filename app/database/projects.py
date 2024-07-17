@@ -234,14 +234,19 @@ def userOwnsProjects(user_id:int, project_ids: list, filename: str = db_file):
             return False
     return True
 
-def getBiggestPosition(user_id: int, filename: str = db_file):
+def getBiggestPosition(user_id: int, filename: str = db_file) -> int:
     query = 'SELECT MAX(position) FROM projects WHERE owner = (?)'
     args = (user_id, )
     connection = sqlite3.connect(filename)
     cursor = connection.cursor()
     cursor.execute(query, args)
     position = cursor.fetchone()
-    return position[0]
+    position = position[0]
+    if position != None:
+        return position
+    else:
+        return 0
+
 
 def updateProjectPosition(project_id: int, position: int, filename: str = db_file):
     query = 'UPDATE projects SET position = (?) WHERE id = (?)'

@@ -69,7 +69,7 @@ def postProject():
     data = request.json
     if data.get('operation_type') == 'new_project':
         #project_id = data.get('project_id')
-        position = getBiggestPosition(current_user.id) + 1
+        position = dbprojects.getBiggestPosition(current_user.id) + 1
         project_id = dbprojects.insertProject(current_user.id, '', [], position)
         response['project_id'] = project_id
     elif data.get('operation_type') == 'update_title':

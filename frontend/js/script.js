@@ -1,5 +1,7 @@
 //import StateManager from './state-manager.js';
 import { fetchProjects } from './todos.js';
+import { hasToken } from './users.js'
+import { redirectLogin } from './redirects.js'
 
 // import components
 import {
@@ -35,6 +37,14 @@ main_section.appendChild( container );
 globalThis.STATE_MANAGER = new StateManager(FRONTEND, BACKEND, container, arrow, navbar, section, false);
 STATE_MANAGER.startUpRoutine();
 STATE_MANAGER.initItemDraggable();
+
+let response = hasToken( BACKEND )
+response.then((result) => {
+    if (result.has_token === false) {
+        redirectLogin(FRONTEND);
+    }
+})
+
 
 //console.log(fetchProjects(BACKEND)) 
 // needed to stop the arrow from appearing on start up
