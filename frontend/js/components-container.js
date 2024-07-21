@@ -128,8 +128,7 @@ export class TodoContainer extends HTMLElement {
         new_child.edit_field.onblur = () => { 
             if (new_child.editorIsEmpty() === true) {
                 new_child.remove();
-                //NOTE: change this when you implement project deletion
-                this.state_manager.saveToLocalStorage();
+                this.state_manager.deleteProjectOnDb(new_child)
                 this.state_manager.updateNavbarContent();
                 //this.state_manager.state = 'overview';
             } else {

@@ -42,6 +42,8 @@ export class TodoProject extends HTMLElement {
         this.save_button.onclick = () => { this.saveEditor(); }
         this.cancel_button.onclick = () => {
             this.closeEditor();
+            globalThis.STATE_MANAGER.deleteProjectOnDb(this)
+            console.log('this is the project that is about to be deleted', this)
         }
 
         this.closeEditor();
