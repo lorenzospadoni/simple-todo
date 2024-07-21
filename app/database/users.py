@@ -6,7 +6,7 @@ working_directory = os.path.dirname(__file__)
 db_file = working_directory + '/' + 'simple-todo.db'
 
 class User:
-    def __init__(self, id: int, username: str, password: str, date_of_subscription: str, is_active: bool):
+    def __init__(self, id: int, username: str, password: bytes, date_of_subscription: str, is_active: bool):
         self.id = id
         self.username = username
         self.password = password
@@ -27,13 +27,12 @@ class User:
         is_anonymous: {self.is_anonymous}
     '''
 
-
 def createUserTable(filename: str = db_file):
     '''CREATEs a new user table if one doesn't exist'''
     query = '''CREATE TABLE users(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT,
-    password TEXT,
+    password BLOB,
     date_of_subscription TEXT,
     is_active BOOLEAN
     )'''
@@ -135,7 +134,28 @@ def usernameAvailable(username: str):
         return True
     else:
         return False
-    
+
+def getPasswordFromId(user_id: int, filename = db_file):
+    query = 'SELECT password FROM users WHERE id = (?)'
+    args = (user_id, )
+    connection = sqlite3.connect(filename)
+    cursor = connection.cursor()
+    cursor.execute(query, args)
+    password = cursor.fetchone
+    return password
+
+def getPasswordFromUsername(username: str, filename = db_file):
+    query = 'SELECT id FROM users WHERE username = (?)'
+    args = (username, )
+    connection = sqlite3.connect(filename)
+    cursor = connection.cursor()
+    cursor.execute(query, args)
+    user_id = cursor.fetchone()
+    user_id = user_id[0]
+    print('user_id type: ', type(user_id), 'user_id', user_id)
+    password = getPasswordFromId(user_id)
+    return password
+
 def checkIfUserPasswordIsCorrect(username: str, password: str, filename = db_file) -> Union[bool, None]:
     '''Checks if there is an user record with the given username and tests its password against the
     given one'''

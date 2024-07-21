@@ -1,7 +1,8 @@
-import items, projects, containers
+import items, projects, containers, users
 
 #todos.setNewItemOrder(2, [1, 2, 3])
 #2, 25
 
-
-print(projects.getBiggestPosition(6))
+users.createUserTable()
+items.createItemTable()
+projects.createProjectTable()

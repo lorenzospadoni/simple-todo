@@ -10,6 +10,7 @@ from database.todos import *
 import database.items as dbitems
 import database.projects as dbprojects
 import database.containers as dbcontainers
+from extensions import bcrypt
 
 @current_app.route('/todos/items', methods=['POST'])
 def handleItemsRequests():
@@ -154,7 +155,9 @@ def registerPost():
     }
     username_available = usernameAvailable(data.get('username'))
     if username_available == True:
-        insertUser(data.get('username'), data.get('password'), True)
+        hashed_password = bcrypt.generate_password_hash(data.get('password'))
+        print(hashed_password)
+        insertUser(data.get('username'), hashed_password, True)
         response['success'] = True
     elif username_available == False:
         response['success'] = False
@@ -169,8 +172,12 @@ def loginPost():
     data = request.json
     username = data.get('username')
     password = data.get('password')
-    attempt = checkIfUserPasswordIsCorrect(username, password)
+    hashed_password = getPasswordFromUsername(username)
+    hashed_password = bcrypt.generate_password_hash(password)
+
+    attempt = bcrypt.check_password_hash(hashed_password, password)
     print(f'ATTEMPT = {attempt}')
+    
     if attempt == True:
         response['login_successful'] = True
         response['error'] = None
