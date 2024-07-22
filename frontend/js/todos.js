@@ -142,9 +142,8 @@ export async function deleteProject(domain, id) {
 
 export async function postItem(domain, project_id) {
     domain = removeSlash(domain);
-    const url = domain + '/todos/items';
+    const url = domain + '/todos/items/new';
     const request = {
-        operation_type : 'new_item',
         parent_project : project_id
     }
     console.log('[postItem()]   parent_project = ' + project_id)
@@ -164,11 +163,9 @@ export async function postItem(domain, project_id) {
 
 export async function postItemContentChange(domain, id, content) {
     domain = removeSlash(domain);
-    const url = domain + '/todos/items';
+    const url = domain + '/todos/items/' + id;
     console.log(url)
     const request = {
-        operation_type : 'update_content',
-        id : id,
         new_content : content
     }
     const options = {
@@ -176,7 +173,7 @@ export async function postItemContentChange(domain, id, content) {
             'Content-Type' : 'application/json'
         },
         body: JSON.stringify(request),
-        method: 'POST',
+        method: 'PUT',
         credentials: 'include'
     }
     const response = await fetch(url, options);
@@ -187,10 +184,9 @@ export async function postItemContentChange(domain, id, content) {
 
 export async function deleteItem(domain, id) {
     let obj = {
-        'id' : id
     }
     domain = removeSlash(domain);
-    const url = domain + '/todos/items';
+    const url = domain + '/todos/items/' + id;
     const options = {
         headers: {
             'Content-Type' : 'application/json'

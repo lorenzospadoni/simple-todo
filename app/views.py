@@ -12,52 +12,49 @@ import database.projects as dbprojects
 import database.containers as dbcontainers
 from extensions import bcrypt
 
-@current_app.route('/todos/items', methods=['POST'])
+
+@login_required
+@current_app.route('/todos/items/<item_id>', methods=['PUT'])
+def RESTNewContent(item_id):
+    response = {}
+    data = request.json
+    if dbitems.userOwnsItem(current_user.id, item_id) == True:
+        dbitems.updateItemContent(item_id, data.get('new_content'))
+        response['updated'] = True
+    else:
+        response['updated'] = False
+    return json.dumps(response)
+
+@login_required
+@current_app.route('/todos/items/<item_id>', methods=['DELETE'])
+def RESTDeleteItem(item_id):
+    response = {}
+    data = request.json
+    if dbitems.userOwnsItem(current_user.id, item_id) == True:
+        dbitems.deleteItem(item_id)
+        response['deleted'] = True
+    else:
+        response['deleted'] = False
+    return json.dumps(response)
+
+@current_app.route('/todos/items/new', methods=['POST'])
 def handleItemsRequests():
     data = request.json
     subject = data.get('operation_type')
     user_id = current_user.id
-    if subject == 'update_content':
-        response = {
-            'updated' : None
-        }
-        item_id = data.get('id')
-        item_id = int(item_id)
-        new_content = data.get('new_content')
-        #print(f'ITEM_ID : {item_id}\ntype: {type(item_id)}\nnew_content: {new_content}\ntype: {type(new_content)}\n')
-        if dbitems.userOwnsItem(user_id, item_id) == True:
-            dbitems.updateItemContent(item_id, new_content)
-            response['updated'] = True
-        else:
-            response['updated'] = False
-    if subject == 'new_item':
-        response = {
-            'item_id' : None,
-            'created' : True
-        }
-        project_id = int(data.get('parent_project'))
-        if dbprojects.userOwnsProject(user_id, project_id) == True:
-            item_id = dbitems.insertItem(user_id, '')
-            dbitems.appendItemToProjectChildren(item_id, project_id)
-            response['item_id'] = item_id
-            response['created'] = True
-        else:
-            response['item_id'] = None
-            response['created'] = True
-    return json.dumps(response)
-
-@login_required
-@current_app.route('/todos/items', methods=['DELETE'])
-def handleItemsDelete():
-    data = request.json
     response = {
-        'deleted' : None
+        'item_id' : None,
+        'created' : True
     }
-    if dbitems.userOwnsItem(current_user.id, data.get('id')) == True:
-        response['deleted'] = True
-        dbitems.removeItemIdFromProjects(data.get('id')) # this doesn't look safe at all lmao
+    project_id = int(data.get('parent_project'))
+    if dbprojects.userOwnsProject(user_id, project_id) == True:
+        item_id = dbitems.insertItem(user_id, '')
+        dbitems.appendItemToProjectChildren(item_id, project_id)
+        response['item_id'] = item_id
+        response['created'] = True
     else:
-        response['deleted'] = False
+        response['item_id'] = None
+        response['created'] = True
     return json.dumps(response)
 
 @login_required
