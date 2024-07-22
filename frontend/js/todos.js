@@ -24,10 +24,9 @@ export async function fetchProjects(domain) {
 
 export async function postProject(domain) {
     domain = removeSlash(domain);
-    const url = domain + '/todos/projects';
+    const url = domain + '/todos/projects/new';
     console.log(url)
     const request = {
-        operation_type : 'new_project',
     }
     const options = {
         headers: {
@@ -45,11 +44,9 @@ export async function postProject(domain) {
 
 export async function postProjectNewTitle(domain, id, title) {
     domain = removeSlash(domain);
-    const url = domain + '/todos/projects';
+    const url = domain + '/todos/projects/' + id;
     console.log(url)
     const request = {
-        operation_type : 'update_title',
-        project_id : id,
         new_title : title
     }
     const options = {
@@ -57,7 +54,7 @@ export async function postProjectNewTitle(domain, id, title) {
             'Content-Type' : 'application/json'
         },
         body: JSON.stringify(request),
-        method: 'POST',
+        method: 'PUT',
         credentials: 'include'
     }
     const response = await fetch(url, options);
@@ -68,10 +65,9 @@ export async function postProjectNewTitle(domain, id, title) {
 
 export async function postProjectNewOrder(project_order, domain) {
     domain = removeSlash(domain);
-    const url = domain + '/todos/projects';
+    const url = domain + '/todos/projects/project_order';
     console.log(url)
     const request = {
-        operation_type : 'new_project_order',
         project_order: project_order
     }
     const options = {
@@ -79,7 +75,7 @@ export async function postProjectNewOrder(project_order, domain) {
             'Content-Type' : 'application/json'
         },
         body: JSON.stringify(request),
-        method: 'POST',
+        method: 'PUT',
         credentials: 'include'
     }
     const response = await fetch(url, options);
@@ -90,11 +86,10 @@ export async function postProjectNewOrder(project_order, domain) {
 
 export async function postNewItemOrder(project_id, item_order, domain) {
     domain = removeSlash(domain);
-    const url = domain + '/todos/projects';
+    const url = domain + '/todos/projects/' + project_id + '/item_order';
     console.log(url)
     const request = {
         operation_type : 'new_item_order',
-        project_id : project_id,
         item_order: item_order
     }
     const options = {
@@ -102,7 +97,7 @@ export async function postNewItemOrder(project_id, item_order, domain) {
             'Content-Type' : 'application/json'
         },
         body: JSON.stringify(request),
-        method: 'POST',
+        method: 'PUT',
         credentials: 'include'
     }
     const response = await fetch(url, options);
@@ -130,9 +125,8 @@ export async function postProjects(domain, obj) {
 export async function deleteProject(domain, id) {
     domain = removeSlash(domain);
     const request = {
-        project_id : id
     }
-    const url = domain + '/todos/projects';
+    const url = domain + '/todos/projects/' + id;
     const options = {
         headers: {
             'Content-Type' : 'application/json'

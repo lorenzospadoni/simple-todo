@@ -15,7 +15,6 @@ from extensions import bcrypt
 @current_app.route('/todos/items', methods=['POST'])
 def handleItemsRequests():
     data = request.json
-    print(data)
     subject = data.get('operation_type')
     user_id = current_user.id
     if subject == 'update_content':
@@ -25,7 +24,7 @@ def handleItemsRequests():
         item_id = data.get('id')
         item_id = int(item_id)
         new_content = data.get('new_content')
-        print(f'ITEM_ID : {item_id}\ntype: {type(item_id)}\nnew_content: {new_content}\ntype: {type(new_content)}\n')
+        #print(f'ITEM_ID : {item_id}\ntype: {type(item_id)}\nnew_content: {new_content}\ntype: {type(new_content)}\n')
         if dbitems.userOwnsItem(user_id, item_id) == True:
             dbitems.updateItemContent(item_id, new_content)
             response['updated'] = True
@@ -62,53 +61,38 @@ def handleItemsDelete():
     return json.dumps(response)
 
 @login_required
-@current_app.route('/todos/projects', methods=['POST'])
-def postProject():
+@current_app.route('/todos/projects/new', methods=['POST'])
+def RESTHandleNewProject():
     response = {
 
     }
     data = request.json
-    if data.get('operation_type') == 'new_project':
-        #project_id = data.get('project_id')
-        position = dbprojects.getBiggestPosition(current_user.id) + 1
-        project_id = dbprojects.insertProject(current_user.id, '', [], position)
-        response['project_id'] = project_id
-    elif data.get('operation_type') == 'update_title':
-        project_id = data.get('project_id')
+    #project_id = data.get('project_id')
+    position = dbprojects.getBiggestPosition(current_user.id) + 1
+    project_id = dbprojects.insertProject(current_user.id, '', [], position)
+    response['project_id'] = project_id
+    return response
+
+@login_required
+@current_app.route('/todos/projects/<project_id>', methods=['PUT'])
+def RESTProjectNewTitle(project_id):
+        response = {}
+        data = request.json
         new_title = data.get('new_title')
         if dbprojects.userOwnsProject(current_user.id, project_id) == True:
             dbprojects.updateProjectTitle(project_id, new_title)
             response['updated'] = True
         else:
             response['updated'] = False
-    elif data.get('operation_type') == 'new_project_order':
-        project_order = data.get('project_order')
-        counter = 0
-        if userOwnsProjects(current_user.id, project_order) == True:
-            for project_id in project_order:
-                counter = counter + 1
-                dbprojects.updateProjectPosition(project_id, counter)
-            response['updated'] = True
-        if userOwnsProjects(current_user.id, project_order) == False:
-            response['updated'] = False
-        # else:
-        #     response['updatsed'] = False
-    elif data.get('operation_type') == 'new_item_order':
-        project_id = data.get('project_id')
-        item_order = data.get('item_order')
-        #item_order = json.loads(item_order)
-        if dbitems.setNewItemOrder(project_id, item_order) == True:
-            response['updated'] = True
-        else:
-            response['updated'] = False
-    return response
+        return response
 
 @login_required
-@current_app.route('/todos/projects', methods=['DELETE'])
-def deleteProjectRequest():
+@current_app.route('/todos/projects/<project_id>', methods=['DELETE'])
+def RESTDeleteProjectRequest(project_id):
     response = {}
     data = request.json
-    project_id = data.get('project_id')
+    project_id = project_id
+
     if dbprojects.userOwnsProject(current_user.id, project_id) == True:
         dbprojects.deleteProjectItems(project_id)
         dbprojects.deleteProject(project_id)
@@ -116,6 +100,43 @@ def deleteProjectRequest():
     else:
         response['deleted'] = False
     return response
+
+@login_required
+@current_app.route('/todos/projects/project_order', methods=['PUT'])
+def RESTnewProjectOrder():
+    response = {}
+    data = request.json
+    project_order = data.get('project_order')
+    counter = 0
+    if userOwnsProjects(current_user.id, project_order) == True:
+        for project_id in project_order:
+            counter = counter + 1
+            dbprojects.updateProjectPosition(project_id, counter)
+            response['updated'] = True
+    elif userOwnsProjects(current_user.id, project_order) == True:
+        response['updated'] = False
+    return json.dumps(response)
+
+@login_required
+@current_app.route('/todos/projects/<project_id>/item_order', methods=['PUT'])
+def RESTProjectNewItemOrder(project_id):
+    response = {
+        'updated' : None
+    }
+    data = request.json
+    item_order = data.get('item_order')
+    #item_order = json.loads(item_order)
+    user_owns_items = userOwnsItems(current_user.id, item_order)
+    if userOwnsProject(current_user.id, project_id) == True and user_owns_items == True:
+        if dbitems.setNewItemOrder(project_id, item_order) == True:
+            response['updated'] = True
+        else:
+            response['updated'] = False
+    else:
+        response['updated'] = False
+    return json.dumps(response)
+
+
     
 @current_app.route('/todos', methods=['GET'])
 def getTodos():
@@ -130,7 +151,6 @@ def getTodos():
     #     }
     # ]
     if current_user.is_authenticated == True:
-        print(type(current_user.id))
         projects = dbprojects.fetchProjectsFromUserId(current_user.id)
         projects = dbprojects.convertProjectCollectionToList(projects)
     else:
@@ -156,7 +176,6 @@ def registerPost():
     username_available = usernameAvailable(data.get('username'))
     if username_available == True:
         hashed_password = bcrypt.generate_password_hash(data.get('password'))
-        print(hashed_password)
         insertUser(data.get('username'), hashed_password, True)
         response['success'] = True
     elif username_available == False:
@@ -176,8 +195,7 @@ def loginPost():
     hashed_password = bcrypt.generate_password_hash(password)
 
     attempt = bcrypt.check_password_hash(hashed_password, password)
-    print(f'ATTEMPT = {attempt}')
-    
+
     if attempt == True:
         response['login_successful'] = True
         response['error'] = None
@@ -200,7 +218,6 @@ def hasToken():
     else:
         response['username'] = None
         response['has_token'] = False
-        print(f"RESPONSE: {response}")
     return json.dumps(response)
 
 @current_app.route('/users/logout', methods=['POST'])

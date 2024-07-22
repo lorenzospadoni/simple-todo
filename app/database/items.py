@@ -247,4 +247,15 @@ def userOwnsItem(user_id: int, item_id: int, filename: str = db_file) -> bool:
         # AttributeError is raised either when you try to access item.owner but fetchItemFromId
         # returned None or when the user is NOT the owner of the Item
         return False
-        
+    
+def userOwnsItems(user_id: int, item_ids: list, filename: str = db_file) -> bool:
+    result = None
+    for item_id in item_ids:
+        iter_result = userOwnsItem(user_id, item_id, filename)
+        if iter_result == False:
+            result = False
+            return result
+        elif iter_result == True:
+            pass
+    result = True
+    return result   
