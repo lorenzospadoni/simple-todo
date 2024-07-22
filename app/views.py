@@ -32,6 +32,7 @@ def RESTDeleteItem(item_id):
     data = request.json
     if dbitems.userOwnsItem(current_user.id, item_id) == True:
         dbitems.deleteItem(item_id)
+        dbitems.removeItemIdFromProjects(item_id)
         response['deleted'] = True
     else:
         response['deleted'] = False
