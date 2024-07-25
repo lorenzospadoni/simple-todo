@@ -4,13 +4,21 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-        
         {
-            "type": "chrome",
+            "name": "Python Debugger: Custom Flask",
+            "type": "debugpy",
             "request": "launch",
-            "name": "Launch Chrome against localhost",
-            "url": "http://localhost:8080",
-            "webRoot": "${workspaceFolder}"
+            "module": "flask",
+            "env": {
+                "FLASK_APP": "app: createApp",
+                "FLASK_DEBUG": "true",
+                "PYTHONPATH":"./app"
+            },
+            "args": [
+                "run",
+            ],
+            "jinja": true,
+            "autoStartBrowser": false
         }
     ]
 }

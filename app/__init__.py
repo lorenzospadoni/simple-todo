@@ -22,5 +22,6 @@ def createApp() -> Flask:
 
 if __name__=='__main__':
     app = createApp()
-    app.run(debug=True)
+    print(__name__)
+    app.run(debug=False)
 
