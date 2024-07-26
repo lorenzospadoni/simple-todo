@@ -26,6 +26,10 @@ class Item:
             }
         return representation
 
+def testFunction() -> str:
+    '''Always returns the string 'hello' '''
+    return 'hello'
+
 def createItemTable(filename: str = db_file ):
     ''' Creates the database table for TodoItems '''
     query = '''
