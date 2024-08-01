@@ -1,6 +1,8 @@
 import items, projects, containers, users
+import sqlite3
 
-#todos.setNewItemOrder(2, [1, 2, 3])
-#2, 25
+output = items.findProjectWithItemId(7)
+print(output)
 
-print(items.fetchItems())
+
+

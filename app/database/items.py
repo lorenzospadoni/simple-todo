@@ -56,19 +56,30 @@ def dropItemTable(filename: str = db_file):
     connection.close()
 
 def insertItem(owner: int, content: str, filename: str = db_file) -> Union[int, None]:
-    try:
-        '''Inserts an item to the database. Datetime is declared by the function'''
-        today_date = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%s')
-        query = 'INSERT INTO items(owner, content, date_of_creation) VALUES(?, ?, ?)'
-        connection = sqlite3.connect(filename)
-        cursor = connection.cursor()
-        cursor.execute(query, (owner, content, today_date))
-        row_id = cursor.lastrowid
-        connection.commit()
-        connection.close()
-        return row_id
-    except:
-        return None
+    '''Inserts an item to the database. Datetime is declared by the function'''
+    today_date = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%s')
+    query = 'INSERT INTO items(owner, content, date_of_creation) VALUES(?, ?, ?)'
+    connection = sqlite3.connect(filename)
+    cursor = connection.cursor()
+    cursor.execute(query, (owner, content, today_date))
+    row_id = cursor.lastrowid
+    connection.commit()
+    connection.close()
+    return row_id
+
+def itemExists(item_id: int, filename: str = db_file) -> bool:
+    '''Returns True if the given item_id exists in the items table, returns False if it does not'''
+    query = 'SELECT * FROM items WHERE id = (?)'
+    args = (item_id, )
+    connection = sqlite3.connect(filename)
+    cursor = connection.cursor()
+    cursor.execute(query, args)
+    item = cursor.fetchone()
+    connection.close()
+    if item != None:
+        return True
+    else:
+        return False
 
 def fromRecordToItem(record: tuple) -> Union[Item, None]:
     '''Converts the output of sqlite to an Item object, returns None if not possible'''
@@ -79,21 +90,26 @@ def fromRecordToItem(record: tuple) -> Union[Item, None]:
         date_of_creation = record[3]
         item = Item(id, owner, content, date_of_creation)
         return item
-    except TypeError:
+    except (TypeError, IndexError):
         # TypeError occurs when id = record[0] is not possible because record is of type 'NoneType'
-        item = None
-    finally:
-        return item
+        return None
 
-def fromRecordsToItemCollection(records: tuple):
+def fromRecordsToItemCollection(records: tuple) -> list:
     '''Converts the output of sqlite to a collection of Item objects'''
     items = []
-    for record in records:
-        item = fromRecordToItem(record)
-        items.append(item)
-    return items
+    try:
+        for record in records:
+            if record != None:
+                item = fromRecordToItem(record)
+                items.append(item)
+            else:
+                pass
+        return items
+    except TypeError:
+        return list()
 
-def fetchItems(filename: str = db_file):
+def fetchItems(filename: str = db_file) -> list:
+    '''Returns a list containing all the items in the db'''
     query = '''SELECT * FROM items'''
     connection = sqlite3.connect(filename)
     cursor = connection.cursor()
@@ -116,73 +132,103 @@ def fetchItemFromId(item_id: int, filename: str = db_file) -> Union[Item, None]:
     except TypeError:
         return None
 
-
-def fetchItemCollectionFromIds(ids:list, filename: str = db_file) -> list:
-    items = []
-    for id in ids:
-        item = fetchItemFromId(id, filename)
-        items.append(item)
-    return items
-
-def updateItemContent(id: int, content: str, filename: str = db_file):
-    '''Changes an item's content'''
-    query = 'UPDATE items SET content = (?) WHERE id = (?)'
-    args = (content, id)
-    connection = sqlite3.connect(filename)
-    cursor = connection.cursor()
-    cursor.execute(query, args)
-    connection.commit()
-    connection.close()
-
-def deleteItem(id: int, filename: str = db_file):
-    '''Deletes the record of an item whose id matches the given id argument'''
-    query = '''DELETE FROM items WHERE id = (?)'''
-    connection = sqlite3.connect(filename)
-    cursor = connection.cursor()
-    cursor.execute(query, (id, ))
-    connection.commit()
-    connection.close()
-    return True
-
-def deleteItems(ids: list, filename: str = db_file):
-    for id in ids:
-        deleteItem(id)
-
-def findProjectWithItemId(item_id: int, filename: str = db_file):
-    '''Returns the id of the project that has a certain item id in its 'items' field'''
-    query = '''
-        SELECT projects.id
-        FROM projects, json_each(projects.items)
-        WHERE json_each.value = (?)
-    '''
-    connection = sqlite3.connect(filename)
-    cursor = connection.cursor()
-    cursor.execute(query, (item_id, ))
-    result = cursor.fetchone()
-    connection.commit()
-    connection.close()
-    return result[0]
-
-def appendItemToProjectChildren(item_id: int, project_id: int, filename: str = db_file) -> bool:
-    '''Appends an Item id to a Project items field in the db '''
-    query = '''
-        SELECT items FROM projects WHERE id = (?)'''
+def fetchItemIdCollectionFromProjectId(project_id: int, filename: str = db_file):
+    query = 'SELECT items FROM projects WHERE id = (?)'
     args = (project_id, )
     connection = sqlite3.connect(filename)
     cursor = connection.cursor()
     cursor.execute(query, args)
-    items = json.loads(cursor.fetchone()[0])
-    items.append(item_id)
-    query = '''
-        UPDATE projects SET items = (?) WHERE id=(?)
-    '''
-    args = (json.dumps(items), project_id)
+    items = cursor.fetchone()
+    items = items[0]
+    items = json.loads(items)
+    return items
+
+def fetchItemCollectionFromIds(item_ids:list, filename: str = db_file) -> list:
+    items = []
+    for item_id in item_ids:
+        item = fetchItemFromId(item_id, filename)
+        if item != None:
+            items.append(item)
+        else:
+            continue
+    return items
+
+def updateItemContent(item_id: int, content: str, filename: str = db_file) -> bool:
+    '''Changes an item's content, returns True if the update was successful and False if it was not'''
+    query = 'UPDATE items SET content = (?) WHERE id = (?)'
+    args = (content, item_id)
+    connection = sqlite3.connect(filename)
+    cursor = connection.cursor()
     cursor.execute(query, args)
+    success = cursor.rowcount > 0
     connection.commit()
     connection.close()
+    return success
+
+def deleteItem(item_id: int, filename: str = db_file):
+    '''Deletes the record of an item whose id matches the given id argument, 
+    returns True if a row was affected, False if it was not'''
+    query = '''DELETE FROM items WHERE id = (?)'''
+    connection = sqlite3.connect(filename)
+    cursor = connection.cursor()
+    cursor.execute(query, (item_id, ))
+    success = cursor.rowcount > 0
+    connection.commit()
+    connection.close()
+    return success
+
+def deleteItems(item_ids: list, filename: str = db_file):
+    for item_id in item_ids:
+        deleteItem(item_id, filename)
+
+def findProjectWithItemId(item_id: int, filename: str = db_file) -> Union[int, None]:
+    #TODO: move this to projects
+    try:
+        '''Returns the id of the project that has a certain item id in its 'items' field'''
+        query = '''
+            SELECT projects.id
+            FROM projects, json_each(projects.items)
+            WHERE json_each.value = (?)
+        '''
+        connection = sqlite3.connect(filename)
+        cursor = connection.cursor()
+        cursor.execute(query, (item_id, ))
+        result = cursor.fetchone()
+        connection.commit()
+        connection.close()
+        return result[0]
+    except TypeError:
+        return None
+
+def appendItemToProjectChildren(item_id: int, project_id: int, filename: str = db_file) -> bool:
+    '''Appends an Item id to a Project items field in the db '''
+    try:
+        query = '''
+            SELECT items FROM projects WHERE id = (?)'''
+        args = (project_id, )
+        connection = sqlite3.connect(filename)
+        cursor = connection.cursor()
+        cursor.execute(query, args)
+        result = cursor.fetchone()
+        items = json.loads(result[0])
+        items.append(item_id)
+        query = '''
+            UPDATE projects SET items = (?) WHERE id=(?)
+        '''
+        args = (json.dumps(items), project_id)
+        cursor.execute(query, args)
+        connection.commit()
+        connection.close()
+        success = cursor.rowcount > 0
+        return success
+    except TypeError:
+        # this happens when result is None in json.loads(result[0])
+        connection.close()
+        return False
+
 
 def getItemOrder(project_id: int, filename: str = db_file) -> list:
-    '''Returns a list of all'''
+    '''Returns a list of all the items belonging toa project'''
     query = 'SELECT items FROM projects WHERE id = (?)'
     args = (project_id, )
     connection = sqlite3.connect(filename)
@@ -202,7 +248,7 @@ def setNewItemOrder(project_id: int, order: list, filename: str = db_file):
             clean_order.append(item)
         else:
             pass
-    print(clean_order)
+    #print(clean_order)
     query = 'UPDATE projects SET items = (?) WHERE id = (?)'
     args = (json.dumps(clean_order), project_id)
     connection = sqlite3.connect(filename)
@@ -213,7 +259,7 @@ def setNewItemOrder(project_id: int, order: list, filename: str = db_file):
     return True
 
 
-def removeItemIdFromProjectItems(item_id: int, project_id: int, filename: str = db_file):
+def removeItemIdFromProjectItems(item_id: int, project_id: int, filename: str = db_file) -> bool:
     query = '''
         SELECT items FROM projects WHERE id=(?)
     '''

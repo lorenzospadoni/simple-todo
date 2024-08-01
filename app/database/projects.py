@@ -1,7 +1,9 @@
-import sqlite3, datetime, json, os
+import sqlite3, datetime, json, os, sys
 from typing import Union
 
-import items as dbitems
+myenv = sys.path
+
+import database.items as dbitems
 
 working_directory = os.path.dirname(__file__)
 db_file = working_directory + '/' + 'simple-todo.db'
@@ -17,9 +19,9 @@ class Project:
     @property
     def obj(self) -> dict:
         children = []
-        print(f'THIS IS ITEMS: {self.items} TYPE: {type(self.items)}')
+        #print(f'THIS IS ITEMS: {self.items} TYPE: {type(self.items)}')
         for item in self.items:
-            print('This is Item: ' + str(item))
+            #print('This is Item: ' + str(item))
             children.append(item.obj)
         representation = {
             'title' : self.title,
