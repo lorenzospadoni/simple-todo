@@ -82,21 +82,33 @@ def dropProjectTable(filename: str = db_file):
     connection.close()
 
 def insertProject(owner: int, title:str, items: list, position: int,filename: str = db_file) -> Union[int, None]:
-    try:
-        '''Inserts a project to the database. Datetime is declared by the function'''
-        today_date = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%s')
-        query = 'INSERT INTO projects(owner, title, items, date_of_creation, position) VALUES(?, ?, ?, ?, ?)'
-        connection = sqlite3.connect(filename)
-        cursor = connection.cursor()
-        cursor.execute(query, (owner, title, json.dumps(items), today_date, position))
-        last_row = cursor.lastrowid
-        connection.commit()
-        connection.close()
-        return last_row
-    except:
-        return None
+    '''Inserts a project to the database. Datetime is declared by the function'''
+    today_date = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%s')
+    query = 'INSERT INTO projects(owner, title, items, date_of_creation, position) VALUES(?, ?, ?, ?, ?)'
+    connection = sqlite3.connect(filename)
+    cursor = connection.cursor()
+    cursor.execute(query, (owner, title, json.dumps(items), today_date, position))
+    last_row = cursor.lastrowid
+    connection.commit()
+    connection.close()
+    return last_row
 
-def updateProjectTitle(project_id: int, new_title: str, filename: str = db_file):
+
+def projectExists(project_id: int, filename: str = db_file) -> bool:
+    '''Returns True if the given project_id exists in the projects table, returns False if it does not'''
+    query = 'SELECT * FROM projects WHERE id = (?)'
+    args = (project_id, )
+    connection = sqlite3.connect(filename)
+    cursor = connection.cursor()
+    cursor.execute(query, args)
+    project = cursor.fetchone()
+    connection.close()
+    if project != None:
+        return True
+    else:
+        return False
+
+def updateProjectTitle(project_id: int, new_title: str, filename: str = db_file) -> bool:
     '''Updates the title of the project matching the given project id'''
     query = 'UPDATE projects SET title = (?) WHERE id = (?)'
     args = (new_title, project_id)
@@ -105,6 +117,8 @@ def updateProjectTitle(project_id: int, new_title: str, filename: str = db_file)
     cursor.execute(query, args)
     connection.commit()
     connection.close()
+    success = cursor.rowcount > 0
+    return success
 
 def convertProjectCollectionToList(projects: list):
     coll = []
@@ -116,15 +130,19 @@ def convertProjectCollectionToList(projects: list):
         pass
     return coll
 
-def fromRecordToProject(record: tuple) -> Project:
+def fromRecordToProject(record: tuple) -> Union[Project, None]:
     '''Returns a Project object from sqlite output'''
-    id = record[0]
-    owner = record[1]
-    title = record[2]
-    items = dbitems.fetchItemCollectionFromIds(json.loads(record[3]))
-    date_of_creation = record[4]
-    position = record[5]
-    project = Project(id, owner, title, items, date_of_creation, position)
+    try:
+        id = record[0]
+        owner = record[1]
+        title = record[2]
+        items = dbitems.fetchItemCollectionFromIds(json.loads(record[3]))
+        date_of_creation = record[4]
+        position = record[5]
+        project = Project(id, owner, title, items, date_of_creation, position)
+    except TypeError:
+        # this occurs when record is None and record[0] raises a TypeError
+        project = None
     return project
 
 def fromRecordsToProjectCollection(records: tuple) -> list:
@@ -135,7 +153,7 @@ def fromRecordsToProjectCollection(records: tuple) -> list:
         projects.append(project)
     return projects
 
-def fetchProjectFromProjectId(project_id: int, filename: str = db_file) -> Union[int, None]:
+def fetchProjectFromProjectId(project_id: int, filename: str = db_file) -> Union[Project, None]:
     '''Returns the project with the given id, returns None if none are found'''
     query = 'SELECT * FROM projects WHERE id = (?)'
     args = (project_id, )
@@ -147,6 +165,16 @@ def fetchProjectFromProjectId(project_id: int, filename: str = db_file) -> Union
     project = fromRecordToProject(record)
     connection.close()
     return project
+
+def fetchProjectCollectionFromProjectIds(project_ids: list, filename: str = db_file) -> Union[list, None]:
+    projects = []
+    for project_id in project_ids:
+        project = fetchProjectFromProjectId(project_id, filename)
+        if project != None:
+            projects.append(project)
+        else:
+            continue
+    return projects
 
 def fetchProjectItems(project_id: int, owner_id:int, filename: str = db_file):
     '''Returns all the items belonging to a project where the owner is the given's user'''
@@ -191,16 +219,19 @@ def fetchProjectsFromUserId(id:int, filename: str = db_file):
     #print(projects)
     return projects
 
-def deleteProject(id, filename: str = db_file):
-    '''Deletes the record of a project whose id matches the given id argument'''
+def deleteProject(id, filename: str = db_file) -> bool:
+    '''Deletes the record of a project whose id matches the given id argument. Returns True if the
+    project exists, False if it does not.'''
     query = '''DELETE FROM projects WHERE id = (?)'''
     connection = sqlite3.connect(filename)
     cursor = connection.cursor()
     cursor.execute(query, (id, ))
     connection.commit()
     connection.close()
+    success = cursor.rowcount > 0
+    return success
 
-def deleteProjectItems(project_id, filename: str = db_file):
+def deleteProjectItems(project_id: int, filename: str = db_file):
     query = 'SELECT items FROM projects WHERE id = (?)'
     args = (project_id, )
     connection = sqlite3.connect(filename)
@@ -208,7 +239,7 @@ def deleteProjectItems(project_id, filename: str = db_file):
     cursor.execute(query, args)
     items = cursor.fetchone()
     items = json.loads(items[0])
-    dbitems.deleteItems(items)
+    dbitems.deleteItems(items, filename)
     connection.commit()
     connection.close()
     return True
@@ -229,14 +260,34 @@ def userOwnsProject(user_id:int, project_id:int, filename: str = db_file):
 def userOwnsProjects(user_id:int, project_ids: list, filename: str = db_file):
     '''Checks if a user with a certain user_id is the owner of all the given projects'''
     for project_id in project_ids:
-        success = userOwnsProject(user_id, project_id)
+        success = userOwnsProject(user_id, project_id, filename)
         if success == True:
             pass
         elif success == False:
             return False
     return True
 
+def getProjectPosition(project_id: int, filename: str = db_file) -> int:
+    '''returns the position field value of a project record, if the project does not exist it returns None'''
+    try:
+        query = 'SELECT position FROM projects WHERE id=(?)'
+        args = (project_id, )
+        connection = sqlite3.connect(filename)
+        cursor = connection.cursor()
+        cursor.execute(query, args)
+        position = cursor.fetchone()
+        position = position[0]
+    except TypeError:
+        # this occurs when position is None
+        position =  None
+    finally:
+        connection.close()
+        return position
+    
+
 def getBiggestPosition(user_id: int, filename: str = db_file) -> int:
+    '''returns the biggest position value of all the projects owned by an user, if there
+    are no projects returns 0'''
     query = 'SELECT MAX(position) FROM projects WHERE owner = (?)'
     args = (user_id, )
     connection = sqlite3.connect(filename)
@@ -249,8 +300,9 @@ def getBiggestPosition(user_id: int, filename: str = db_file) -> int:
     else:
         return 0
 
-
-def updateProjectPosition(project_id: int, position: int, filename: str = db_file):
+def updateProjectPosition(project_id: int, position: int, filename: str = db_file) -> bool:
+    '''Updates the position field of a project record, returns True if it succeeds,
+    False if it does not'''
     query = 'UPDATE projects SET position = (?) WHERE id = (?)'
     args = (position, project_id)
     connection = sqlite3.connect(filename)
@@ -258,5 +310,7 @@ def updateProjectPosition(project_id: int, position: int, filename: str = db_fil
     cursor.execute(query, args)
     connection.commit()
     connection.close()
+    success = cursor.rowcount > 0
+    return success
 
 

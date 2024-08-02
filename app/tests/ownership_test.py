@@ -88,4 +88,94 @@ class TestUserOwnsItems(unittest.TestCase):
 
         for result in results:
             self.assertFalse(result)
-            
+
+class TestUserOwnsProject(unittest.TestCase):
+    def setUp(self):
+        prj.createProjectTable(filename='testdb.db')
+        self.project0 = prj.insertProject(owner = 1, title='ciao', items=[], position = 1, filename='testdb.db')
+        self.project1 = prj.insertProject(owner = 2, title='hello', items=[], position = 2, filename='testdb.db')
+        self.project2 = prj.insertProject(owner = 3, title='bonjour', items=[], position = 3, filename='testdb.db')
+        self.project3 = prj.insertProject(owner = 4, title='hola', items=[], position = 4, filename='testdb.db')
+               
+    def tearDown(self):
+        if os.path.exists('testdb.db') == True:
+            os.remove('testdb.db')
+        else:
+            raise FileNotFoundError('testdb.db does not seem to exist')
+    
+    def testTrue(self):
+        result0 = prj.userOwnsProject(user_id = 1, project_id = self.project0, filename='testdb.db')
+        result1 = prj.userOwnsProject(user_id = 2, project_id = self.project1, filename='testdb.db')
+        result2 = prj.userOwnsProject(user_id = 3, project_id = self.project2, filename='testdb.db')
+        result3 = prj.userOwnsProject(user_id = 4, project_id = self.project3, filename='testdb.db')
+        results = [result0, result1, result2, result3]
+
+        for result in results:
+            self.assertTrue(result)
+
+    def testFalse(self):
+        result0 = prj.userOwnsProject(user_id = 555, project_id = self.project0, filename='testdb.db')
+        result1 = prj.userOwnsProject(user_id = 8785, project_id = self.project1, filename='testdb.db')
+        result2 = prj.userOwnsProject(user_id = 32345, project_id = self.project2, filename='testdb.db')
+        result3 = prj.userOwnsProject(user_id = 35342, project_id = self.project3, filename='testdb.db')
+        results = [result0, result1, result2, result3]
+
+        for result in results:
+            self.assertFalse(result)
+
+    def testItemNotExists(self):
+        result0 = prj.userOwnsProject(user_id = 555, project_id = 3463, filename='testdb.db')
+        result1 = prj.userOwnsProject(user_id = 8785, project_id = 3463, filename='testdb.db')
+        result2 = prj.userOwnsProject(user_id = 32345, project_id = 6565, filename='testdb.db')
+        result3 = prj.userOwnsProject(user_id = 35342, project_id = 11, filename='testdb.db')
+        results = [result0, result1, result2, result3]
+
+        for result in results:
+            self.assertFalse(result)
+
+class TestUserOwnsProjects(unittest.TestCase):
+    def setUp(self):
+        prj.createProjectTable(filename='testdb.db')
+        self.project0 = prj.insertProject(owner = 1, title='ciao', items=[], position= 1, filename='testdb.db')
+        self.project1 = prj.insertProject(owner = 1, title='hello', items=[], position= 2, filename='testdb.db')
+        self.project2 = prj.insertProject(owner = 2, title='bonjour', items=[], position= 3, filename='testdb.db')
+        self.project3 = prj.insertProject(owner = 2, title='hola', items=[], position= 4, filename='testdb.db')
+               
+    def tearDown(self):
+        if os.path.exists('testdb.db') == True:
+            os.remove('testdb.db')
+        else:
+            raise FileNotFoundError('testdb.db does not seem to exist')
+    
+    def testTrue(self):
+        result0 = prj.userOwnsProjects(user_id=1, project_ids=[self.project0, self.project1], filename='testdb.db')
+        result1 = prj.userOwnsProjects(user_id=1, project_ids=[self.project0, self.project1], filename='testdb.db')
+
+        results = [result0, result1]
+
+        for result in results:
+            self.assertTrue(result)
+
+    def testFalse(self):
+        result0 = prj.userOwnsProjects(user_id = 555, project_ids = [self.project0, self.project1], filename='testdb.db')
+        result1 = prj.userOwnsProjects(user_id = 8785, project_ids = [self.project2, self.project3], filename='testdb.db')
+        result2 = prj.userOwnsProjects(user_id = 32345, project_ids = [self.project0, self.project3], filename='testdb.db')
+        result3 = prj.userOwnsProjects(user_id = 35342, project_ids = [self.project1, self.project2], filename='testdb.db')
+        results = [result0, result1, result2, result3]
+
+        for result in results:
+            self.assertFalse(result)
+
+    def testProjectNotExists(self):
+        result0 = prj.userOwnsProjects(user_id = 555, project_ids = [3463, 43], filename='testdb.db')
+        result1 = prj.userOwnsProjects(user_id = 8785, project_ids = [3463, 54353], filename='testdb.db')
+        result2 = prj.userOwnsProjects(user_id = 32345, project_ids = [6565, 1], filename='testdb.db')
+        result3 = prj.userOwnsProjects(user_id = 35342, project_ids = [11, 56], filename='testdb.db')
+        results = [result0, result1, result2, result3]
+
+        for result in results:
+            self.assertFalse(result)
+
+
+if __name__ == '__main__':
+    unittest.main()
