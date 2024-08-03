@@ -3,6 +3,7 @@ from typing import Union
 
 myenv = sys.path
 
+import database.utils as dbutils
 import database.items as dbitems
 
 working_directory = os.path.dirname(__file__)
@@ -66,43 +67,27 @@ def createProjectTable(filename: str = db_file):
     position INTEGER
     );
     '''
-    connection = sqlite3.connect(filename)
-    cursor = connection.cursor()
-    cursor.execute(query)
-    connection.commit()
-    connection.close()
+    dbutils.execQuery(query, (), filename)
 
 def dropProjectTable(filename: str = db_file):
     '''Removes the database project table'''
     query = 'DROP TABLE projects'
-    connection = sqlite3.connect(filename)
-    cursor = connection.cursor()
-    cursor.execute(query)
-    connection.commit()
-    connection.close()
+    dbutils.execQuery(query, (), filename)
+
 
 def insertProject(owner: int, title:str, items: list, position: int,filename: str = db_file) -> Union[int, None]:
     '''Inserts a project to the database. Datetime is declared by the function'''
     today_date = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%s')
     query = 'INSERT INTO projects(owner, title, items, date_of_creation, position) VALUES(?, ?, ?, ?, ?)'
-    connection = sqlite3.connect(filename)
-    cursor = connection.cursor()
-    cursor.execute(query, (owner, title, json.dumps(items), today_date, position))
-    last_row = cursor.lastrowid
-    connection.commit()
-    connection.close()
+    args = (owner, title, json.dumps(items), today_date, position)
+    last_row = dbutils.execLastRowId(query, args, filename)
     return last_row
-
 
 def projectExists(project_id: int, filename: str = db_file) -> bool:
     '''Returns True if the given project_id exists in the projects table, returns False if it does not'''
     query = 'SELECT * FROM projects WHERE id = (?)'
     args = (project_id, )
-    connection = sqlite3.connect(filename)
-    cursor = connection.cursor()
-    cursor.execute(query, args)
-    project = cursor.fetchone()
-    connection.close()
+    project = dbutils.execFetchone(query, args, filename)
     if project != None:
         return True
     else:
@@ -112,12 +97,8 @@ def updateProjectTitle(project_id: int, new_title: str, filename: str = db_file)
     '''Updates the title of the project matching the given project id'''
     query = 'UPDATE projects SET title = (?) WHERE id = (?)'
     args = (new_title, project_id)
-    connection = sqlite3.connect(filename)
-    cursor = connection.cursor()
-    cursor.execute(query, args)
-    connection.commit()
-    connection.close()
-    success = cursor.rowcount > 0
+    rowcount = dbutils.execRowcount(query, args, filename)
+    success = rowcount > 0
     return success
 
 def convertProjectCollectionToList(projects: list):
@@ -157,13 +138,9 @@ def fetchProjectFromProjectId(project_id: int, filename: str = db_file) -> Union
     '''Returns the project with the given id, returns None if none are found'''
     query = 'SELECT * FROM projects WHERE id = (?)'
     args = (project_id, )
-    connection = sqlite3.connect(filename)
-    cursor = connection.cursor()
-    cursor.execute(query, args)
-    record = cursor.fetchone()
+    record = dbutils.execFetchone(query, args, filename)
     #return record[3]
     project = fromRecordToProject(record)
-    connection.close()
     return project
 
 def fetchProjectCollectionFromProjectIds(project_ids: list, filename: str = db_file) -> Union[list, None]:
@@ -180,29 +157,22 @@ def fetchProjectItems(project_id: int, owner_id:int, filename: str = db_file):
     '''Returns all the items belonging to a project where the owner is the given's user'''
     query = '''SELECT items FROM projects WHERE id = (?) AND owner = (?)'''
     args = (project_id, owner_id)
-    connection = sqlite3.connect(filename)
-    cursor = connection.cursor()
-    cursor.execute(query, args)
-    item_ids = cursor.fetchone()
-    item_ids = item_ids[0]
+    result = dbutils.execFetchone(query, args, filename)
+    item_ids = result[0]
     item_ids = json.loads(item_ids)
     # print(type(item_ids[0]))
     items = []
+    query = 'SELECT * FROM items WHERE id = (?)'
     for item_id in item_ids:
-        cursor.execute('SELECT * FROM items WHERE id = (?)', (item_id,))
-        record = cursor.fetchone()
+        args = (item_id, )
+        record = dbutils.execFetchone(query, args, filename)
         item = dbitems.fromRecordToItem(record)
         items.append(item)
-    connection.close()
     return items
 
 def fetchProjects(filename: str = db_file):
     query = '''SELECT * FROM projects ORDER BY position ASC'''
-    connection = sqlite3.connect(filename)
-    cursor = connection.cursor()
-    cursor.execute(query)
-    projects_raw = cursor.fetchall()
-    connection.close()
+    projects_raw = dbutils.execFetchall(query, (), filename)
     # projects = []
     projects = fromRecordsToProjectCollection(projects_raw)
     return projects
@@ -210,38 +180,26 @@ def fetchProjects(filename: str = db_file):
 def fetchProjectsFromUserId(id:int, filename: str = db_file):
     query = '''SELECT * FROM projects WHERE owner = (?) ORDER BY position ASC'''
     args = (id, )
-    connection = sqlite3.connect(filename)
-    cursor = connection.cursor()
-    cursor.execute(query, args)
-    projects_raw = cursor.fetchall()
-    connection.close()
+    projects_raw = dbutils.execFetchall(query, args, filename)
     projects = fromRecordsToProjectCollection(projects_raw)
-    #print(projects)
     return projects
 
-def deleteProject(id, filename: str = db_file) -> bool:
+def deleteProject(project_id, filename: str = db_file) -> bool:
     '''Deletes the record of a project whose id matches the given id argument. Returns True if the
     project exists, False if it does not.'''
     query = '''DELETE FROM projects WHERE id = (?)'''
-    connection = sqlite3.connect(filename)
-    cursor = connection.cursor()
-    cursor.execute(query, (id, ))
-    connection.commit()
-    connection.close()
-    success = cursor.rowcount > 0
+    args = (project_id, )
+    rowcount = dbutils.execRowcount(query, args, filename)
+    success = rowcount > 0
     return success
 
+#TODO: this doesn't handle success or failure
 def deleteProjectItems(project_id: int, filename: str = db_file):
     query = 'SELECT items FROM projects WHERE id = (?)'
     args = (project_id, )
-    connection = sqlite3.connect(filename)
-    cursor = connection.cursor()
-    cursor.execute(query, args)
-    items = cursor.fetchone()
-    items = json.loads(items[0])
+    result = dbutils.execFetchone(query, args, filename)
+    items = json.loads(result[0])
     dbitems.deleteItems(items, filename)
-    connection.commit()
-    connection.close()
     return True
 
 def userOwnsProject(user_id:int, project_id:int, filename: str = db_file):
@@ -272,16 +230,12 @@ def getProjectPosition(project_id: int, filename: str = db_file) -> int:
     try:
         query = 'SELECT position FROM projects WHERE id=(?)'
         args = (project_id, )
-        connection = sqlite3.connect(filename)
-        cursor = connection.cursor()
-        cursor.execute(query, args)
-        position = cursor.fetchone()
-        position = position[0]
+        result = dbutils.execFetchone(query, args, filename)
+        position = result[0]
     except TypeError:
         # this occurs when position is None
         position =  None
     finally:
-        connection.close()
         return position
     
 
@@ -290,11 +244,8 @@ def getBiggestPosition(user_id: int, filename: str = db_file) -> int:
     are no projects returns 0'''
     query = 'SELECT MAX(position) FROM projects WHERE owner = (?)'
     args = (user_id, )
-    connection = sqlite3.connect(filename)
-    cursor = connection.cursor()
-    cursor.execute(query, args)
-    position = cursor.fetchone()
-    position = position[0]
+    result = dbutils.execFetchone(query, args, filename)
+    position = result[0]
     if position != None:
         return position
     else:
@@ -305,12 +256,8 @@ def updateProjectPosition(project_id: int, position: int, filename: str = db_fil
     False if it does not'''
     query = 'UPDATE projects SET position = (?) WHERE id = (?)'
     args = (position, project_id)
-    connection = sqlite3.connect(filename)
-    cursor = connection.cursor()
-    cursor.execute(query, args)
-    connection.commit()
-    connection.close()
-    success = cursor.rowcount > 0
+    rowcount = dbutils.execRowcount(query, args, filename)
+    success = rowcount > 0
     return success
 
 
