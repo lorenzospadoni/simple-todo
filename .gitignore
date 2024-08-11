@@ -4,6 +4,7 @@ frontend/js/dist/*
 
 venv/*
 app/database/simple-todo.db
+app/database/simple-todo.db.old
 **/__pycache__/ 
 .env
 app/database/test.db

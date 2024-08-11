@@ -10,30 +10,31 @@ working_directory = os.path.dirname(__file__)
 db_file = working_directory + '/' + 'simple-todo.db'
 
 class Project:
-    def __init__(self, id: int, owner: int, title: str, items: list, date_of_creation: str, position) -> object:
+    def __init__(self, id: int, owner: int, title: str, date_of_creation: str, position) -> object:
         self.id = id
         self.owner = owner
         self.title = title
-        self.items = items
+        self.items = []
         self.date_of_creation = date_of_creation
         self.position = position
     @property
     def obj(self) -> dict:
-        children = []
+        #children = []
         #print(f'THIS IS ITEMS: {self.items} TYPE: {type(self.items)}')
-        for item in self.items:
-            #print('This is Item: ' + str(item))
-            children.append(item.obj)
+        
         representation = {
             'title' : self.title,
             'id' : self.id,
-            'children' : children,
+            'children' : self.children,
             'position' : self.position
         }
         return representation
     @property
-    def item_list(self) -> list:
-        pass
+    def children(self) -> list:
+        output = []
+        for item in self.items:
+            output.append(item.obj)
+        return output
     @staticmethod
     def fetchItemObjects(ids: list, filename: str = db_file):
         query = 'SELECT * FROM items WHERE id = (?)'
@@ -62,7 +63,6 @@ def createProjectTable(filename: str = db_file):
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     owner INTEGER,
     title TEXT,
-    items JSON,
     date_of_creation TEXT,
     position INTEGER
     );
@@ -75,11 +75,11 @@ def dropProjectTable(filename: str = db_file):
     dbutils.execQuery(query, (), filename)
 
 
-def insertProject(owner: int, title:str, items: list, position: int,filename: str = db_file) -> Union[int, None]:
+def insertProject(owner: int, title:str, position: int,filename: str = db_file) -> Union[int, None]:
     '''Inserts a project to the database. Datetime is declared by the function'''
     today_date = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%s')
-    query = 'INSERT INTO projects(owner, title, items, date_of_creation, position) VALUES(?, ?, ?, ?, ?)'
-    args = (owner, title, json.dumps(items), today_date, position)
+    query = 'INSERT INTO projects(owner, title, date_of_creation, position) VALUES(?, ?, ?, ?)'
+    args = (owner, title, today_date, position)
     last_row = dbutils.execLastRowId(query, args, filename)
     return last_row
 
@@ -108,7 +108,7 @@ def convertProjectCollectionToList(projects: list):
             coll_json = project.obj
             coll.append(coll_json)
     except AttributeError:
-        pass
+        raise Exception
     return coll
 
 def fromRecordToProject(record: tuple) -> Union[Project, None]:
@@ -117,10 +117,9 @@ def fromRecordToProject(record: tuple) -> Union[Project, None]:
         id = record[0]
         owner = record[1]
         title = record[2]
-        items = dbitems.fetchItemCollectionFromIds(json.loads(record[3]))
-        date_of_creation = record[4]
-        position = record[5]
-        project = Project(id, owner, title, items, date_of_creation, position)
+        date_of_creation = record[3]
+        position = record[4]
+        project = Project(id, owner, title, date_of_creation, position)
     except TypeError:
         # this occurs when record is None and record[0] raises a TypeError
         project = None
@@ -153,21 +152,46 @@ def fetchProjectCollectionFromProjectIds(project_ids: list, filename: str = db_f
             continue
     return projects
 
+def appendItemToProjectChildren(item_id: int, project_id: int, filename: str = db_file) -> bool:
+    '''Appends an Item id to a Project items field in the db '''
+    if projectExists(project_id, filename) == True:
+        pos = dbitems.getItemGreatestPosition(project_id, filename)
+        query = '''UPDATE items SET parent = (?), position = (?) WHERE id = (?)'''
+        args = (project_id, pos, item_id)
+        rowcount = dbutils.execRowcount(query, args, filename)
+        success = rowcount > 0
+    else:
+        success = False
+    return success
+    # try:
+    #     query = '''
+    #         SELECT items FROM projects WHERE id = (?)'''
+    #     args = (project_id, )
+
+    #     result = dbutils.execFetchone(query, args, filename)
+    #     item_ids = json.loads(result[0])
+    #     item_ids.append(item_id)
+
+    #     query = '''
+    #         UPDATE projects SET items = (?) WHERE id=(?)
+    #     '''
+    #     args = (json.dumps(item_ids), project_id)
+
+    #     rowcount = dbutils.execRowcount(query, args, filename)
+    #     success = rowcount > 0
+    #     return success
+    # except TypeError:
+    #     # this happens when result is None in json.loads(result[0])
+    #     return False
+
 def fetchProjectItems(project_id: int, owner_id:int, filename: str = db_file):
     '''Returns all the items belonging to a project where the owner is the given's user'''
-    query = '''SELECT items FROM projects WHERE id = (?) AND owner = (?)'''
+    query = '''SELECT * FROM items WHERE parent = (?) AND owner = (?) ORDER BY position ASC'''
     args = (project_id, owner_id)
-    result = dbutils.execFetchone(query, args, filename)
-    item_ids = result[0]
-    item_ids = json.loads(item_ids)
+    result = dbutils.execFetchall(query, args, filename)
+    item_ids = result
     # print(type(item_ids[0]))
-    items = []
-    query = 'SELECT * FROM items WHERE id = (?)'
-    for item_id in item_ids:
-        args = (item_id, )
-        record = dbutils.execFetchone(query, args, filename)
-        item = dbitems.fromRecordToItem(record)
-        items.append(item)
+    items = dbitems.fromRecordsToItemCollection(item_ids)
     return items
 
 def fetchProjects(filename: str = db_file):
@@ -182,6 +206,9 @@ def fetchProjectsFromUserId(id:int, filename: str = db_file):
     args = (id, )
     projects_raw = dbutils.execFetchall(query, args, filename)
     projects = fromRecordsToProjectCollection(projects_raw)
+    for project in projects:
+        children = dbitems.fetchItemCollectionFromProjectId(project.id)
+        project.items = children
     return projects
 
 def deleteProject(project_id, filename: str = db_file) -> bool:
@@ -195,10 +222,10 @@ def deleteProject(project_id, filename: str = db_file) -> bool:
 
 #TODO: this doesn't handle success or failure
 def deleteProjectItems(project_id: int, filename: str = db_file):
-    query = 'SELECT items FROM projects WHERE id = (?)'
+    query = 'SELECT id FROM items WHERE parent = (?)'
     args = (project_id, )
-    result = dbutils.execFetchone(query, args, filename)
-    items = json.loads(result[0])
+    result = dbutils.execFetchall(query, args, filename)
+    items = dbutils.cleanFetchall(result)
     dbitems.deleteItems(items, filename)
     return True
 

@@ -4,6 +4,15 @@ from typing import Union
 working_directory = os.path.dirname(__file__)
 db_file = working_directory + '/' + 'simple-todo.db'
 
+#TODO: How does this handle Nones?
+#TODO:should this skip over them or not?
+#TODO: unittest this function
+def cleanFetchall(record: list):
+    output = []
+    for rec in record:
+        output.append(rec[0])
+    return output
+
 def execQuery(query: str, args: tuple, filename: str = db_file) -> None:
     '''Executes a query, commits and closes the connection. Alsways returns None'''
     connection = sqlite3.connect(filename)

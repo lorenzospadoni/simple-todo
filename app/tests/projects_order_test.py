@@ -5,10 +5,10 @@ import database.projects as prj
 class TestGetProjectPosition(unittest.TestCase):
     def setUp(self):
         prj.createProjectTable(filename='testdb.db')
-        self.project0 = prj.insertProject(owner = 2, title='ciao', items=[], position = 1, filename='testdb.db')
-        self.project1 = prj.insertProject(owner = 2, title='hello', items=[], position = 2, filename='testdb.db')
-        self.project2 = prj.insertProject(owner = 2, title='bonjour', items=[], position = 3, filename='testdb.db')
-        self.project3 = prj.insertProject(owner = 2, title='hola', items=[], position = 4, filename='testdb.db')
+        self.project0 = prj.insertProject(owner = 2, title='ciao', position = 1, filename='testdb.db')
+        self.project1 = prj.insertProject(owner = 2, title='hello', position = 2, filename='testdb.db')
+        self.project2 = prj.insertProject(owner = 2, title='bonjour', position = 3, filename='testdb.db')
+        self.project3 = prj.insertProject(owner = 2, title='hola', position = 4, filename='testdb.db')
                
     def tearDown(self):
         if os.path.exists('testdb.db') == True:
@@ -45,10 +45,10 @@ class TestGetProjectPosition(unittest.TestCase):
 class TestGetBiggestPosition(unittest.TestCase):
     def setUp(self):
         prj.createProjectTable(filename='testdb.db')
-        self.project0 = prj.insertProject(owner = 2, title='ciao', items=[], position = 1, filename='testdb.db')
-        self.project1 = prj.insertProject(owner = 2, title='hello', items=[], position = 2, filename='testdb.db')
-        self.project2 = prj.insertProject(owner = 2, title='bonjour', items=[], position = 3, filename='testdb.db')
-        self.project3 = prj.insertProject(owner = 2, title='hola', items=[], position = 4, filename='testdb.db')
+        self.project0 = prj.insertProject(owner = 2, title='ciao', position = 1, filename='testdb.db')
+        self.project1 = prj.insertProject(owner = 2, title='hello', position = 2, filename='testdb.db')
+        self.project2 = prj.insertProject(owner = 2, title='bonjour', position = 3, filename='testdb.db')
+        self.project3 = prj.insertProject(owner = 2, title='hola', position = 4, filename='testdb.db')
                
     def tearDown(self):
         if os.path.exists('testdb.db') == True:
@@ -74,7 +74,7 @@ class TestGetBiggestPosition(unittest.TestCase):
 class TestUpdateProjectPosition(unittest.TestCase):
     def setUp(self):
         prj.createProjectTable(filename='testdb.db')
-        self.project_id = prj.insertProject(owner = 2, title='ciao', items=[], position = 1, filename='testdb.db')
+        self.project_id = prj.insertProject(owner = 2, title='ciao', position = 1, filename='testdb.db')
  
     def tearDown(self):
         if os.path.exists('testdb.db') == True:

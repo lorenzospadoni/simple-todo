@@ -2,20 +2,23 @@ import sqlite3, datetime, json, os
 from typing import Union
 
 import database.utils as dbutils
-
 working_directory = os.path.dirname(__file__)
 db_file = working_directory + '/' + 'simple-todo.db'
 
 class Item:
-    def __init__(self, id: int, owner: int, content: str, date_of_creation: str):
+    def __init__(self, id: int, owner: int, parent: int, position: int, content: str, date_of_creation: str):
         self.id = id
         self.owner = owner
+        self.parent = parent
+        self.position = position
         self.content = content
         self.date_of_creation = date_of_creation
     def __repr__(self):
         return f'''[ITEM]
         id: {self.id}
         owner: {self.owner}
+        parent: {self.parent}
+        position: {self.position}
         content: {self.content}
         date_of_creation: {self.date_of_creation}
 
@@ -24,6 +27,8 @@ class Item:
     def obj(self) -> dict:
         representation = {
                 'id' : self.id,
+                'parent' : self.parent,
+                'position' : self.position,
                 'content' : self.content            
             }
         return representation
@@ -38,6 +43,8 @@ def createItemTable(filename: str = db_file ):
         CREATE TABLE items(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         owner INTEGER,
+        parent INTEGER,
+        position INTEGER,
         content TEXT,
         date_of_creation TEXT
         );
@@ -50,11 +57,13 @@ def dropItemTable(filename: str = db_file):
     dbutils.execQuery(query, (), filename)
 
 
-def insertItem(owner: int, content: str, filename: str = db_file) -> Union[int, None]:
-    '''Inserts an item to the database. Datetime is declared by the function'''
+def insertItem(owner: int, parent: int, position: int, content: str, filename: str = db_file) -> Union[int, None]:
+    '''Inserts an item to the database. Datetime is declared by the function. 
+    If the record is created returns the id, otherwise returns None'''
     today_date = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%s')
-    query = 'INSERT INTO items(owner, content, date_of_creation) VALUES(?, ?, ?)'
-    row_id = dbutils.execLastRowId(query, (owner, content, today_date), filename)
+    query = 'INSERT INTO items(owner, parent, position, content, date_of_creation) VALUES(?, ?, ?, ?, ?)'
+    args = (owner, parent, position, content, today_date)
+    row_id = dbutils.execLastRowId(query, args, filename)
     return row_id
 
 def itemExists(item_id: int, filename: str = db_file) -> bool:
@@ -72,9 +81,11 @@ def fromRecordToItem(record: tuple) -> Union[Item, None]:
     try:
         id = record[0]
         owner = record[1]
-        content = record[2]
-        date_of_creation = record[3]
-        item = Item(id, owner, content, date_of_creation)
+        parent = record[2]
+        position = record[3]
+        content = record[4]
+        date_of_creation = record[5]
+        item = Item(id, owner, parent, position, content, date_of_creation)
         return item
     except (TypeError, IndexError):
         # TypeError occurs when id = record[0] is not possible because record is of type 'NoneType'
@@ -96,7 +107,7 @@ def fromRecordsToItemCollection(records: tuple) -> list:
 
 def fetchItems(filename: str = db_file) -> list:
     '''Returns a list containing all the items in the db'''
-    query = '''SELECT * FROM items'''
+    query = '''SELECT * FROM items ORDER BY position ASC'''
     items_raw = dbutils.execFetchall(query, (), filename)
     items = fromRecordsToItemCollection(items_raw)
     return items
@@ -112,12 +123,23 @@ def fetchItemFromId(item_id: int, filename: str = db_file) -> Union[Item, None]:
     except TypeError:
         return None
 
-def fetchItemIdCollectionFromProjectId(project_id: int, filename: str = db_file):
-    query = 'SELECT items FROM projects WHERE id = (?)'
+#TODO: is this tested?
+def fetchItemIdCollectionFromProjectId(project_id: int, filename: str = db_file) -> list:
+    query = 'SELECT id FROM items WHERE parent = (?)'
     args = (project_id, )
-    items = dbutils.execFetchone(query, args, filename)
-    items = items[0]
-    items = json.loads(items)
+    items = dbutils.execFetchall(query, args, filename)
+    items = list(items)
+    return items
+
+#TODO: Test this
+def fetchItemCollectionFromProjectId(project_id: int, filename: str = db_file) -> list:
+    query = 'SELECT * FROM items WHERE parent = (?) ORDER BY position'
+    args = (project_id, )
+    result = dbutils.execFetchall(query, args, filename)
+    items = fromRecordsToItemCollection(result)
+    if items == None:
+        items = []
+    print(items)
     return items
 
 def fetchItemCollectionFromIds(item_ids: list, filename: str = db_file) -> list:
@@ -156,10 +178,13 @@ def findProjectWithItemId(item_id: int, filename: str = db_file) -> Union[int, N
     try:
         '''Returns the id of the project that has a certain item id in its 'items' field'''
         query = '''
-            SELECT projects.id
-            FROM projects, json_each(projects.items)
-            WHERE json_each.value = (?)
-        '''
+            SELECT parent FROM items WHERE id=(?)
+'''
+        # query = '''
+        #     SELECT projects.id
+        #     FROM projects, json_each(projects.items)
+        #     WHERE json_each.value = (?)
+        # '''
         args = (item_id, )
         result = dbutils.execFetchone(query, args, filename)
         project = result[0]
@@ -167,42 +192,30 @@ def findProjectWithItemId(item_id: int, filename: str = db_file) -> Union[int, N
     except TypeError:
         return None
 
-#TODO: move this to projects (maybe?)
-def appendItemToProjectChildren(item_id: int, project_id: int, filename: str = db_file) -> bool:
-    '''Appends an Item id to a Project items field in the db '''
-    try:
-        query = '''
-            SELECT items FROM projects WHERE id = (?)'''
-        args = (project_id, )
-
-        result = dbutils.execFetchone(query, args, filename)
-        item_ids = json.loads(result[0])
-        item_ids.append(item_id)
-
-        query = '''
-            UPDATE projects SET items = (?) WHERE id=(?)
-        '''
-        args = (json.dumps(item_ids), project_id)
-
-        rowcount = dbutils.execRowcount(query, args, filename)
-        success = rowcount > 0
-        return success
-    except TypeError:
-        # this happens when result is None in json.loads(result[0])
-        return False
+#TODO: unittest this function
+def getItemGreatestPosition(project_id: int, filename: str = db_file) -> Union[int, None]:
+    '''Returns the greatest position taken amongst all the items belonging to a project'''
+    # TODO: should I worry about user ownership?
+    query = 'SELECT MAX(position) FROM items WHERE parent=(?)'
+    args = (project_id, )
+    result = dbutils.execFetchone(query, args, filename)
+    position = result[0]
+    if position == None:
+        position = 0
+    return position
 
 
 #TODO: this doesn't have error handling??? 
 def getItemOrder(project_id: int, filename: str = db_file) -> list:
-    '''Returns a list of all the items belonging toa project'''
-    query = 'SELECT items FROM projects WHERE id = (?)'
+    '''Returns a list of all the items belonging to a project'''
+    query = 'SELECT id FROM items WHERE parent = (?)'
     args = (project_id, )
-    connection = sqlite3.connect(filename)
-    cursor = connection.cursor()
-    cursor.execute(query, args)
-    result = dbutils.execFetchone(query, args, filename)
-    order_json = result[0]
-    order = json.loads(order_json)
+    result = dbutils.execFetchall(query, args, filename)
+    order = []
+    for res in result:
+        order.append(res[0])
+    if result == None:
+        return list()
     return order
 
 #TODO: finish all validations
@@ -217,13 +230,27 @@ def setNewItemOrder(project_id: int, order: list, filename: str = db_file):
             clean_order.append(item)
         else:
             pass
-    query = 'UPDATE projects SET items = (?) WHERE id = (?)'
+    # ensures the item id is valid
+    query = 'UPDATE items SET position = (?) WHERE id = (?)'
     args = (json.dumps(clean_order), project_id)
-    rowcount = dbutils.execRowcount(query, args, filename)
-    success = rowcount > 0
+    counter = 0
+    successes = []
+    for item_id in clean_order:
+        counter = counter + 1
+        args = (counter, item_id)
+        rowcount = dbutils.execRowcount(query, args, filename)
+        success = rowcount > 0
+        successes.append(success)
+
+    # if any of the results is fallacious returns False
+    for succ in successes:
+        if succ == True:
+            success = True
+        else:
+            return False
     return success
 
-
+# DEPRECATED
 def removeItemIdFromProjectItems(item_id: int, project_id: int, filename: str = db_file) -> bool:
     query = '''
         SELECT items FROM projects WHERE id=(?)

@@ -53,13 +53,16 @@ def dropUserTable(filename: str = db_file):
 
 def createUserObjectFromRecord(record):
     '''Takes a record as argument and returns a User object'''
-    id = record[0]
-    username = record[1]
-    password = record[2]
-    date_of_subscription = record[3]
-    is_active = bool(record[4])
-    user = User(id, username, password, date_of_subscription, is_active)
-    return user
+    try:
+        id = record[0]
+        username = record[1]
+        password = record[2]
+        date_of_subscription = record[3]
+        is_active = bool(record[4])
+        user = User(id, username, password, date_of_subscription, is_active)
+        return user
+    except TypeError:
+        return None
 
 def insertUser(username: str, password: str, is_active: bool, filename = db_file) -> Union[int, None]:
     try:

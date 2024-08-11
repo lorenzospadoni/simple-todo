@@ -5,9 +5,9 @@ import database.projects as prj
 class testInsertProject(unittest.TestCase):
     def setUp(self):
         prj.createProjectTable('testdb.db')
-        self.a_id = prj.insertProject(owner=1, title='hello', items=[], position=1, filename='testdb.db')
-        self.b_id = prj.insertProject(owner=2, title='bonjour', items=[], position=2, filename='testdb.db')
-        self.c_id = prj.insertProject(owner=3, title='ciao', items=[], position=3, filename='testdb.db')
+        self.a_id = prj.insertProject(owner=1, title='hello', position=1, filename='testdb.db')
+        self.b_id = prj.insertProject(owner=2, title='bonjour', position=2, filename='testdb.db')
+        self.c_id = prj.insertProject(owner=3, title='ciao', position=3, filename='testdb.db')
         self.projects = prj.fetchProjects('testdb.db')
         self.a_project = self.projects[0]
         self.b_project = self.projects[1]
@@ -38,7 +38,7 @@ class testInsertProject(unittest.TestCase):
 class testProjectExists(unittest.TestCase):
     def setUp(self):
         prj.createProjectTable('testdb.db')
-        self.a_id = prj.insertProject(owner=1, title='hello', items=[], position=1, filename='testdb.db')
+        self.a_id = prj.insertProject(owner=1, title='hello', position=1, filename='testdb.db')
 
     def tearDown(self):
         if os.path.exists('testdb.db') == True:
@@ -67,21 +67,18 @@ class TestUpdateProjectTitle(unittest.TestCase):
         self.id0 = prj.insertProject(
             owner=1, 
             title='hello', 
-            items=[], 
             position = 1, 
             filename='testdb.db'
         )
         self.id1 = prj.insertProject(
             owner=2, 
             title='bonjour', 
-            items=[], 
             position = 2, 
             filename='testdb.db'
             )
         self.id2 = prj.insertProject(
             owner=3, 
             title='ciao', 
-            items=[], 
             position = 3, 
             filename='testdb.db')
 
@@ -123,20 +120,17 @@ class TestDeleteProject(unittest.TestCase):
         self.id0 = prj.insertProject(
             owner=1, 
             title='hello', 
-            items=[], 
             position = 1, 
             filename='testdb.db')
         self.id1 = prj.insertProject(
             owner=2, 
             title='bonjour', 
-            items=[], 
             position = 2, 
             filename='testdb.db'
             )
         self.id2 = prj.insertProject(
             owner=3, 
             title='ciao', 
-            items=[], 
             position = 3, 
             filename='testdb.db')
 
@@ -187,23 +181,40 @@ class TestDeleteProject(unittest.TestCase):
         prj.deleteProject(self.id2, 'testdb.db')
         project2 = prj.fetchProjectFromProjectId(self.id2, 'testdb.db')
         self.assertIsNone(project2)
-
+### DEPRECATED
 class TestDeleteProjectItems(unittest.TestCase):
     def setUp(self):
         itm.createItemTable('testdb.db')
         prj.createProjectTable('testdb.db')
 
-        self.item0 = itm.insertItem(owner = 1, content = 'test0', filename='testdb.db')
-        self.item1 = itm.insertItem(owner = 1, content = 'test1', filename='testdb.db')
-        self.item2 = itm.insertItem(owner = 1, content = 'test2', filename='testdb.db')
+        self.id0 = prj.insertProject(
+            owner=1, 
+            title='hello', 
+            position = 1, 
+            filename='testdb.db')
+        self.id1 = prj.insertProject(
+            owner=2, 
+            title='bonjour', 
+            position = 2, 
+            filename='testdb.db'
+            )
+        self.id2 = prj.insertProject(
+            owner=3, 
+            title='ciao', 
+            position = 3, 
+            filename='testdb.db')
 
-        self.item3 = itm.insertItem(owner = 1, content = 'test3', filename='testdb.db')
-        self.item4 = itm.insertItem(owner = 1, content = 'test4', filename='testdb.db')
-        self.item5 = itm.insertItem(owner = 1, content = 'test5', filename='testdb.db')
+        self.item0 = itm.insertItem(owner = 1, parent=self.id0, position=1, content = 'test0', filename='testdb.db')
+        self.item1 = itm.insertItem(owner = 1, parent=self.id0, position=2, content = 'test1', filename='testdb.db')
+        self.item2 = itm.insertItem(owner = 1, parent=self.id0, position=3, content = 'test2', filename='testdb.db')
 
-        self.item6 = itm.insertItem(owner = 1, content = 'test6', filename='testdb.db')
-        self.item7 = itm.insertItem(owner = 1, content = 'test7', filename='testdb.db')
-        self.item8 = itm.insertItem(owner = 1, content = 'test8', filename='testdb.db')
+        self.item3 = itm.insertItem(owner = 1, parent=self.id1, position=1, content = 'test3', filename='testdb.db')
+        self.item4 = itm.insertItem(owner = 1, parent=self.id1, position=2, content = 'test4', filename='testdb.db')
+        self.item5 = itm.insertItem(owner = 1, parent=self.id1, position=3, content = 'test5', filename='testdb.db')
+
+        self.item6 = itm.insertItem(owner = 1, parent=self.id2, position=1, content = 'test6', filename='testdb.db')
+        self.item7 = itm.insertItem(owner = 1, parent=self.id2, position=2, content = 'test7', filename='testdb.db')
+        self.item8 = itm.insertItem(owner = 1, parent=self.id2, position=3, content = 'test8', filename='testdb.db')
 
         self.items = [
             self.item0, 
@@ -218,25 +229,7 @@ class TestDeleteProjectItems(unittest.TestCase):
         ]
 
 
-        self.id0 = prj.insertProject(
-            owner=1, 
-            title='hello', 
-            items=[self.item0, self.item1, self.item2], 
-            position = 1, 
-            filename='testdb.db')
-        self.id1 = prj.insertProject(
-            owner=2, 
-            title='bonjour', 
-            items=[self.item3, self.item4, self.item5], 
-            position = 2, 
-            filename='testdb.db'
-            )
-        self.id2 = prj.insertProject(
-            owner=3, 
-            title='ciao', 
-            items=[self.item6, self.item7, self.item8], 
-            position = 3, 
-            filename='testdb.db')
+        
         
     def tearDown(self):
         if os.path.exists('testdb.db') == True:

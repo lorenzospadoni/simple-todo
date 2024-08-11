@@ -5,9 +5,9 @@ import database.projects as prj
 class testFromRecordToItem(unittest.TestCase):
     def setUp(self):
         itm.createItemTable('testdb.db')
-        record0 = (30, 5, 'Ciao', '2024-10-15 20:22:1721943498')
-        record1 = (30, 34, 'Hello', '2024-07-25 23:38:1721943498')
-        record2 = (30, 99, 'Bonjour', '2024-10-6 23:38:1721943498')
+        record0 = (30, 5, 0, 0, 'Ciao', '2024-10-15 20:22:1721943498')
+        record1 = (30, 34, 0, 0, 'Hello', '2024-07-25 23:38:1721943498')
+        record2 = (30, 99, 0, 0, 'Bonjour', '2024-10-6 23:38:1721943498')
         record3 = (None, )
         record4 = (None)
         self.item0 = itm.fromRecordToItem(record0)
@@ -36,14 +36,14 @@ class testFromRecordToItemCollection(unittest.TestCase):
     def setUp(self):
         itm.createItemTable('testdb.db')
         self.test_records0 = (
-            (30, 5, 'Ciao', '2024-10-15 20:22:1721943498'),
-            (30, 34, 'Hello', '2024-07-25 23:38:1721943498'),
-            (30, 99, 'Bonjour', '2024-10-6 23:38:1721943498')
+            (30, 5, 0, 0, 'Ciao', '2024-10-15 20:22:1721943498'),
+            (30, 34, 0, 0, 'Hello', '2024-07-25 23:38:1721943498'),
+            (30, 99, 0, 0, 'Bonjour', '2024-10-6 23:38:1721943498')
         )
         self.test_records1 = (None, )
         self.test_records2 = None
         self.test_records3 = (
-            (30, 5, 'Ciao', '2024-10-15 20:22:1721943498'),
+            (30, 5, 'Ciao', 0, 0, '2024-10-15 20:22:1721943498'),
             None,
         )
 

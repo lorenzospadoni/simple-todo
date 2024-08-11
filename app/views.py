@@ -54,8 +54,10 @@ def handleNewItemsRequests():
         }
         project_id = int(data.get('parent_project'))
         if dbprojects.userOwnsProject(user_id, project_id) == True:
-            item_id = dbitems.insertItem(user_id, '')
-            dbitems.appendItemToProjectChildren(item_id, project_id)
+            pos = dbitems.getItemGreatestPosition(project_id)
+            pos = pos + 1
+            item_id = dbitems.insertItem(user_id, project_id, pos, '')
+            #dbitems.appendItemToProjectChildren(item_id, project_id)
             response['item_id'] = item_id
             response['created'] = True
         else:
@@ -74,7 +76,7 @@ def RESTHandleNewProject():
     data = request.json
     #project_id = data.get('project_id')
     position = dbprojects.getBiggestPosition(current_user.id) + 1
-    project_id = dbprojects.insertProject(current_user.id, '', [], position)
+    project_id = dbprojects.insertProject(current_user.id, '', position)
     response['project_id'] = project_id
     return response
 
@@ -122,7 +124,7 @@ def RESTnewProjectOrder():
                 counter = counter + 1
                 dbprojects.updateProjectPosition(project_id, counter)
                 response['updated'] = True
-        elif userOwnsProjects(current_user.id, project_order) == True:
+        elif userOwnsProjects(current_user.id, project_order) == False:
             response['updated'] = False
         return json.dumps(response)
     except ValidationError as err:

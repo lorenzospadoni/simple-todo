@@ -5,9 +5,9 @@ import database.projects as prj
 class testFetchItems(unittest.TestCase):
     def setUp(self):
         itm.createItemTable('testdb.db')
-        self.id0 = itm.insertItem(owner=1, content='hello', filename='testdb.db')
-        self.id1 = itm.insertItem(owner=2, content='bonjour', filename='testdb.db')
-        self.id2 = itm.insertItem(owner=3, content='ciao', filename='testdb.db')
+        self.id0 = itm.insertItem(owner=1, parent=0, position=0, content='hello', filename='testdb.db')
+        self.id1 = itm.insertItem(owner=2, parent=0, position=0, content='bonjour', filename='testdb.db')
+        self.id2 = itm.insertItem(owner=3, parent=0, position=0, content='ciao', filename='testdb.db')
 
     def tearDown(self):
         if os.path.exists('testdb.db') == True:
@@ -31,9 +31,9 @@ class testFetchItems(unittest.TestCase):
 class TestFetchItemFromId(unittest.TestCase):
     def setUp(self):
         itm.createItemTable('testdb.db')
-        self.id0 = itm.insertItem(owner=1, content='hello', filename='testdb.db')
-        self.id1 = itm.insertItem(owner=2, content='bonjour', filename='testdb.db')
-        self.id2 = itm.insertItem(owner=3, content='ciao', filename='testdb.db')
+        self.id0 = itm.insertItem(owner=1, parent=0, position=0, content='hello', filename='testdb.db')
+        self.id1 = itm.insertItem(owner=2, parent=0, position=0, content='bonjour', filename='testdb.db')
+        self.id2 = itm.insertItem(owner=3, parent=0, position=0, content='ciao', filename='testdb.db')
 
     def tearDown(self):
         if os.path.exists('testdb.db') == True:
@@ -84,9 +84,9 @@ class TestFetchItemFromId(unittest.TestCase):
 class testFetchItemsFromIds(unittest.TestCase):
     def setUp(self):
         itm.createItemTable('testdb.db')
-        self.id0 = itm.insertItem(owner=1, content='hello', filename='testdb.db')
-        self.id1 = itm.insertItem(owner=2, content='bonjour', filename='testdb.db')
-        self.id2 = itm.insertItem(owner=3, content='ciao', filename='testdb.db')
+        self.id0 = itm.insertItem(owner=1, parent=0, position=0, content='hello', filename='testdb.db')
+        self.id1 = itm.insertItem(owner=2, parent=0, position=0, content='bonjour', filename='testdb.db')
+        self.id2 = itm.insertItem(owner=3, parent=0, position=0, content='ciao', filename='testdb.db')
 
     def tearDown(self):
         if os.path.exists('testdb.db') == True:
@@ -113,13 +113,13 @@ class TestFindProjectWithItemId(unittest.TestCase):
         itm.createItemTable('testdb.db')
         prj.createProjectTable('testdb.db')
 
-        self.item_id0 = itm.insertItem(owner=1, content='hello', filename='testdb.db')
-        self.item_id1 = itm.insertItem(owner=2, content='bonjour', filename='testdb.db')
-        self.item_id2 = itm.insertItem(owner=3, content='ciao', filename='testdb.db')
-        self.item_id3 = itm.insertItem(owner=3, content='Hola', filename='testdb.db')
+        self.item_id0 = itm.insertItem(owner=1, parent=1, position=1, content='hello', filename='testdb.db')
+        self.item_id1 = itm.insertItem(owner=2, parent=1, position=2, content='bonjour', filename='testdb.db')
+        self.item_id2 = itm.insertItem(owner=3, parent=2, position=1, content='ciao', filename='testdb.db')
+        self.item_id3 = itm.insertItem(owner=3, parent=2, position=2, content='Hola', filename='testdb.db')
 
-        self.project_id0 = prj.insertProject(owner=1, title='Test Project', items=[self.item_id0, self.item_id1], position = 0, filename='testdb.db')
-        self.project_id1 = prj.insertProject(owner=2, title='Test Project 2', items=[self.item_id2, self.item_id3], position = 1, filename='testdb.db')
+        self.project_id0 = prj.insertProject(owner=1, title='Test Project', position = 0, filename='testdb.db')
+        self.project_id1 = prj.insertProject(owner=2, title='Test Project 2', position = 1, filename='testdb.db')
 
     def tearDown(self):
         if os.path.exists('testdb.db') == True:

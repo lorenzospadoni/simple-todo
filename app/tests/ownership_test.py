@@ -5,10 +5,10 @@ import database.projects as prj
 class TestUserOwnsItem(unittest.TestCase):
     def setUp(self):
         itm.createItemTable(filename='testdb.db')
-        self.item0 = itm.insertItem(owner = 1, content='ciao', filename='testdb.db')
-        self.item1 = itm.insertItem(owner = 2, content='hello', filename='testdb.db')
-        self.item2 = itm.insertItem(owner = 3, content='bonjour', filename='testdb.db')
-        self.item3 = itm.insertItem(owner = 4, content='hola', filename='testdb.db')
+        self.item0 = itm.insertItem(owner = 1, parent=0, position=0, content='ciao', filename='testdb.db')
+        self.item1 = itm.insertItem(owner = 2, parent=0, position=0, content='hello', filename='testdb.db')
+        self.item2 = itm.insertItem(owner = 3, parent=0, position=0, content='bonjour', filename='testdb.db')
+        self.item3 = itm.insertItem(owner = 4, parent=0, position=0, content='hola', filename='testdb.db')
                
     def tearDown(self):
         if os.path.exists('testdb.db') == True:
@@ -49,10 +49,10 @@ class TestUserOwnsItem(unittest.TestCase):
 class TestUserOwnsItems(unittest.TestCase):
     def setUp(self):
         itm.createItemTable(filename='testdb.db')
-        self.item0 = itm.insertItem(owner = 1, content='ciao', filename='testdb.db')
-        self.item1 = itm.insertItem(owner = 1, content='hello', filename='testdb.db')
-        self.item2 = itm.insertItem(owner = 2, content='bonjour', filename='testdb.db')
-        self.item3 = itm.insertItem(owner = 2, content='hola', filename='testdb.db')
+        self.item0 = itm.insertItem(owner = 1, parent=0, position=0, content='ciao', filename='testdb.db')
+        self.item1 = itm.insertItem(owner = 1, parent=0, position=0, content='hello', filename='testdb.db')
+        self.item2 = itm.insertItem(owner = 2, parent=0, position=0, content='bonjour', filename='testdb.db')
+        self.item3 = itm.insertItem(owner = 2, parent=0, position=0, content='hola', filename='testdb.db')
                
     def tearDown(self):
         if os.path.exists('testdb.db') == True:
@@ -92,10 +92,10 @@ class TestUserOwnsItems(unittest.TestCase):
 class TestUserOwnsProject(unittest.TestCase):
     def setUp(self):
         prj.createProjectTable(filename='testdb.db')
-        self.project0 = prj.insertProject(owner = 1, title='ciao', items=[], position = 1, filename='testdb.db')
-        self.project1 = prj.insertProject(owner = 2, title='hello', items=[], position = 2, filename='testdb.db')
-        self.project2 = prj.insertProject(owner = 3, title='bonjour', items=[], position = 3, filename='testdb.db')
-        self.project3 = prj.insertProject(owner = 4, title='hola', items=[], position = 4, filename='testdb.db')
+        self.project0 = prj.insertProject(owner = 1, title='ciao', position = 1, filename='testdb.db')
+        self.project1 = prj.insertProject(owner = 2, title='hello', position = 2, filename='testdb.db')
+        self.project2 = prj.insertProject(owner = 3, title='bonjour', position = 3, filename='testdb.db')
+        self.project3 = prj.insertProject(owner = 4, title='hola', position = 4, filename='testdb.db')
                
     def tearDown(self):
         if os.path.exists('testdb.db') == True:
@@ -136,10 +136,10 @@ class TestUserOwnsProject(unittest.TestCase):
 class TestUserOwnsProjects(unittest.TestCase):
     def setUp(self):
         prj.createProjectTable(filename='testdb.db')
-        self.project0 = prj.insertProject(owner = 1, title='ciao', items=[], position= 1, filename='testdb.db')
-        self.project1 = prj.insertProject(owner = 1, title='hello', items=[], position= 2, filename='testdb.db')
-        self.project2 = prj.insertProject(owner = 2, title='bonjour', items=[], position= 3, filename='testdb.db')
-        self.project3 = prj.insertProject(owner = 2, title='hola', items=[], position= 4, filename='testdb.db')
+        self.project0 = prj.insertProject(owner = 1, title='ciao', position= 1, filename='testdb.db')
+        self.project1 = prj.insertProject(owner = 1, title='hello', position= 2, filename='testdb.db')
+        self.project2 = prj.insertProject(owner = 2, title='bonjour', position= 3, filename='testdb.db')
+        self.project3 = prj.insertProject(owner = 2, title='hola', position= 4, filename='testdb.db')
                
     def tearDown(self):
         if os.path.exists('testdb.db') == True:

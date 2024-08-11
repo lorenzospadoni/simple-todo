@@ -5,9 +5,9 @@ import database.projects as prj
 class testInsertItem(unittest.TestCase):
     def setUp(self):
         itm.createItemTable('testdb.db')
-        self.a_id = itm.insertItem(owner=1, content='hello', filename='testdb.db')
-        self.b_id = itm.insertItem(owner=2, content='bonjour', filename='testdb.db')
-        self.c_id = itm.insertItem(owner=3, content='ciao', filename='testdb.db')
+        self.a_id = itm.insertItem(owner=1, parent = 1, position=1, content='hello', filename='testdb.db')
+        self.b_id = itm.insertItem(owner=2, parent = 1, position=2, content='bonjour', filename='testdb.db')
+        self.c_id = itm.insertItem(owner=3, parent = 1, position=3, content='ciao', filename='testdb.db')
         self.items = itm.fetchItems('testdb.db')
         self.a_item = self.items[0]
         self.b_item = self.items[1]
@@ -40,7 +40,7 @@ class testInsertItem(unittest.TestCase):
 class testItemExists(unittest.TestCase):
     def setUp(self):
         itm.createItemTable('testdb.db')
-        self.a_id = itm.insertItem(owner=1, content='hello', filename='testdb.db')
+        self.a_id = itm.insertItem(owner=1, parent=0, position = 0, content='hello', filename='testdb.db')
 
     def tearDown(self):
         if os.path.exists('testdb.db') == True:
@@ -65,9 +65,9 @@ class testItemExists(unittest.TestCase):
 class TestUpdateItemContent(unittest.TestCase):
     def setUp(self):
         itm.createItemTable('testdb.db')
-        self.id0 = itm.insertItem(owner=1, content='hello', filename='testdb.db')
-        self.id1 = itm.insertItem(owner=2, content='bonjour', filename='testdb.db')
-        self.id2 = itm.insertItem(owner=3, content='ciao', filename='testdb.db')
+        self.id0 = itm.insertItem(owner=1, parent = 1, position=1, content='hello', filename='testdb.db')
+        self.id1 = itm.insertItem(owner=2, parent = 1, position=2, content='bonjour', filename='testdb.db')
+        self.id2 = itm.insertItem(owner=3, parent = 1, position=3, content='ciao', filename='testdb.db')
 
     def tearDown(self):
         if os.path.exists('testdb.db') == True:
@@ -103,9 +103,9 @@ class TestUpdateItemContent(unittest.TestCase):
 class TestDeleteItem(unittest.TestCase):
     def setUp(self):
         itm.createItemTable('testdb.db')
-        self.id0 = itm.insertItem(owner=1, content='hello', filename='testdb.db')
-        self.id1 = itm.insertItem(owner=2, content='bonjour', filename='testdb.db')
-        self.id2 = itm.insertItem(owner=3, content='ciao', filename='testdb.db')
+        self.id0 = itm.insertItem(owner=1, parent = 1, position=1, content='hello', filename='testdb.db')
+        self.id1 = itm.insertItem(owner=2, parent = 1, position=1, content='bonjour', filename='testdb.db')
+        self.id2 = itm.insertItem(owner=3, parent = 1, position=1, content='ciao', filename='testdb.db')
 
     def tearDown(self):
         if os.path.exists('testdb.db') == True:
