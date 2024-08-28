@@ -233,10 +233,11 @@ export class TodoContainer extends HTMLElement {
             returned_element.obj = project;
             this.state_manager.updateNavbarContent()
         })
+        globalThis.STATE_MANAGER.content_loaded = true;
     }
     get obj() {
         let data = [];
-        let children = Array.prototype.slice.call(this.item_box.children);
+        let children = this._children;
         children.forEach( ( child ) => {
             data.push(child.obj);
         });
@@ -247,6 +248,18 @@ export class TodoContainer extends HTMLElement {
     }
     set json(json_data) {
         this.obj = JSON.parse(json_data);
+    }
+
+    get _children() {
+        return Array.prototype.slice.call(this.item_box.children);
+    }
+
+    get hashes() {
+        let hashes = [];
+        this._children.forEach( (child) => {
+            hashes.push(child.id);
+        })
+        return hashes;
     }
 
 

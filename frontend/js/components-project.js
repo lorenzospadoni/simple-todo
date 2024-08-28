@@ -7,7 +7,7 @@ export class TodoProject extends HTMLElement {
         super();
         this.tags_appended = false;
 
-        this._id = null;
+        this.__id = null;
         this.state_manager = null;
 
         this.title_box = document.createElement('h3'); // tie this to a title attribute in the tag
@@ -63,9 +63,17 @@ export class TodoProject extends HTMLElement {
         }
 
     }
+    set _id(val) {
+        this.__id = val;
+        this.id = val;
+    }
+    get _id() {
+        return this.__id;
+    }
     connectedCallback() {
         console.log('TodoProject added to document');
-
+        //this.id = this._id;
+        //globalThis.STATE_MANAGER.routes.push(this.id);
         if (this.tags_appended === false) {
             console.log('[project] is equal to false')
             let tags = this.innerHTML;
@@ -218,7 +226,7 @@ export class TodoProject extends HTMLElement {
         object_arg.children.forEach( ( child_obj ) => {
             this.state_manager.destroyItemDraggable()
             let child_html = this.newChild();
-            child_html.obj =  child_obj ;
+            child_html.obj =  child_obj;
             this.state_manager.initItemDraggable()
         });
     }

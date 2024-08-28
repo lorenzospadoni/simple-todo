@@ -28,6 +28,7 @@ export class StateManager {
         this._navbar.container = this._container;
 
         this._project_draggable = null;
+        this._content_loaded = false;
         this.project_draggable_active = false;
         this.project_is_dragging = null;
 
@@ -37,7 +38,50 @@ export class StateManager {
         if (startup_routine === true) {
             this.startUpRoutine();
         }
+    }
 
+    set content_loaded(val) {
+        if (val === true) {
+            window.addEventListener('hashchange', this.onHashChange);
+            if (window.location.hash) {
+                this.onHashChange();
+            }
+        }
+    }
+    get content_loaded() {
+        return this._content_loaded;
+    }
+
+    hashExists(hash) {
+        // TODO: I don't know why but when an hash is not found hashExists doesn't seem to work
+        hash = hash.substring(1);
+        const result = this.container.hashes.includes(hash);
+        return result;
+    }
+    
+    // this is done because otherwise the event listener will think 'this' refers to window
+    // thus calling window.hashExists() and throwing a TypeError 
+    onHashChange = () => {
+        const hash = window.location.hash;
+        console.log(`The current hash is: ${hash}`);
+        let result = this.hashExists(hash);
+        if (result === true) {
+            this.redirectHash(hash);
+        } else {
+            // this is just StackOverflow magic
+            // DON'T TOUCH!!!
+            history.pushState("", document.title, window.location.pathname
+                + window.location.search);
+        }
+    }
+
+    redirectHash(given_hash) {
+        const new_hash = given_hash.substring(1);
+        const el = document.getElementById(new_hash);
+        const clickEvent  = new MouseEvent('dblclick', {
+            view: window
+        });
+        el.dispatchEvent (clickEvent);
     }
     async startUpRoutine() {
         this.getSave();
@@ -53,8 +97,9 @@ export class StateManager {
     }
     
     async getSave() {
-        let projects = await fetchProjects(this.backend)
+        let projects = await fetchProjects(this.backend);
         this.container.json = projects;
+        this.content_loaded = true;
 
     } 
     postSave() {
@@ -91,6 +136,8 @@ export class StateManager {
     postProjectTitleChange(project) {
         if (project._id != null) {
             this.handleProjectTitleChange(project);
+        } else {
+            throw new TypeError("project._id should not be null");
         }
     }
     async postOrder(project_id, item_order) {
